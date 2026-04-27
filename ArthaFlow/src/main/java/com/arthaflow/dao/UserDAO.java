@@ -18,9 +18,10 @@ public class UserDAO {
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getRole());
 
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error while creating User"+e.getMessage());
             return false;
         }
     }
@@ -41,11 +42,11 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("full_name"));
                 user.setRole(rs.getString("role"));
-                user.setCreatedDate(rs.getString("created_date"));
+                user.setCreatedDate(rs.getTimestamp("created_date"));
                 return user;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error while fetching User"+e.getMessage());
         }
         return null;
     }
@@ -66,11 +67,12 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("full_name"));
                 user.setRole(rs.getString("role"));
-                user.setCreatedDate(rs.getString("created_date"));
+                user.setCreatedDate(rs.getTimestamp("created_date"));
                 return user;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error while fetching User"+e.getMessage());
+
         }
         return null;
     }
@@ -88,7 +90,8 @@ public class UserDAO {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error while updating User info"+e.getMessage());
+
             return false;
         }
     }
@@ -102,7 +105,7 @@ public class UserDAO {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error while removing User"+e.getMessage());
             return false;
         }
     }

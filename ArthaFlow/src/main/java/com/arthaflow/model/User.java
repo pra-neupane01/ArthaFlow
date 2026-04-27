@@ -11,6 +11,7 @@ public class User {
     private String role;
     private Timestamp createdDate;
 
+    public User() {};
 
     public User(int id, String email, String password, String fullName, String role) {
         this.id = id;

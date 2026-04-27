@@ -11,6 +11,8 @@ public class Transaction {
     private String description;
     private Timestamp transactionDate;
 
+    public Transaction() {};
+
     public Transaction(int id, int accountId, String type, double amount, double balanceAfter, String description, Timestamp transactionDate) {
         this.id = id;
         this.accountId = accountId;
