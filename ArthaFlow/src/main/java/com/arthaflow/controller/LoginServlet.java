@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("login")
+@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     UserService userservice = new UserService();
 
