@@ -4,7 +4,7 @@ package com.arthaflow.model;
 import java.sql.Timestamp;
 
 public class User {
-    private int id;
+    private int userId;
     private String email;
     private String password;
     private String fullName;
@@ -16,8 +16,8 @@ public class User {
 
     public User() {};
 
-    public User(int id, String email, String password, String fullName, String address, String phoneNumber, String role, String status, Timestamp createdDate) {
-        this.id = id;
+    public User(int userId, String email, String password, String fullName, String address, String phoneNumber, String role, String status, Timestamp createdDate) {
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.fullName = fullName;
@@ -28,12 +28,12 @@ public class User {
         this.createdDate = createdDate;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {

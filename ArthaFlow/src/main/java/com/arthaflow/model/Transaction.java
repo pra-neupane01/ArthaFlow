@@ -3,7 +3,7 @@ package com.arthaflow.model;
 import java.sql.Timestamp;
 
 public class Transaction {
-    private int id;
+    private int transactionId;
     private int accountId;
     private String type;
     private double amount;
@@ -15,23 +15,23 @@ public class Transaction {
     public Transaction() {};
 
 
-    public Transaction(int id, int accountId, String type, double amount, double balanceAfter, String remarks, String staus, Timestamp transactionDate) {
-        this.id = id;
+    public Transaction(int transactionId, int accountId, String type, double amount, double balanceAfter, String remarks, String status, Timestamp transactionDate) {
+        this.transactionId = transactionId;
         this.accountId = accountId;
         this.type = type;
         this.amount = amount;
         this.balanceAfter = balanceAfter;
         this.remarks = remarks;
-        this.status = staus;
+        this.status = status;
         this.transactionDate = transactionDate;
     }
 
-    public int getId() {
-        return id;
+    public int getTransactionId() {
+        return transactionId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
     }
 
     public int getAccountId() {
@@ -74,12 +74,12 @@ public class Transaction {
         this.remarks = remarks;
     }
 
-    public String getStaus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStaus(String staus) {
-        this.status = staus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Timestamp getTransactionDate() {
