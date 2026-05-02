@@ -13,6 +13,18 @@ public class ValidationService {
         return false;
     }
 
+    public static boolean isValidphoneNumber(String phoneNumber){
+        String phoneNumberRegex = "^\\+977\\s?(97|98)[0-9]{8}$|^(97|98)[0-9]{8}$";
+        if (phoneNumber != null && phoneNumber.matches(phoneNumberRegex)){
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
     public static boolean isValidPassword(String password){
         String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         if (password != null && password.matches(passwordRegex)){

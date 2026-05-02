@@ -9,14 +9,16 @@ public class UserDAO {
 
     // Register new user
     public boolean registerUser(User user) {
-        String sql = "INSERT INTO users (email, password, full_name, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, password, phone_number, full_name, address, role) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
-            ps.setString(3, user.getFullName());
-            ps.setString(4, user.getRole());
+            ps.setString(3, user.getPhoneNumber());
+            ps.setString(4, user.getFullName());
+            ps.setString(5,user.getAddress());
+            ps.setString(6, user.getRole());
 
 
             return ps.executeUpdate() > 0;
@@ -40,7 +42,9 @@ public class UserDAO {
                 user.setId(rs.getInt("id"));
                 user.setEmail(rs.getString("email"));
                 user.setPassword(rs.getString("password"));
+                user.setPhoneNumber(rs.getString("phone_number"));
                 user.setFullName(rs.getString("full_name"));
+                user.setAddress(rs.getString("address"));
                 user.setRole(rs.getString("role"));
                 user.setCreatedDate(rs.getTimestamp("created_date"));
                 return user;
@@ -65,7 +69,9 @@ public class UserDAO {
                 user.setId(rs.getInt("id"));
                 user.setEmail(rs.getString("email"));
                 user.setPassword(rs.getString("password"));
+                user.setPhoneNumber(rs.getString("phone_number"));
                 user.setFullName(rs.getString("full_name"));
+                user.setAddress(rs.getString("address"));
                 user.setRole(rs.getString("role"));
                 user.setCreatedDate(rs.getTimestamp("created_date"));
                 return user;
@@ -79,14 +85,16 @@ public class UserDAO {
 
     // Update user
     public boolean updateUser(User user) {
-        String sql = "UPDATE users SET email = ?, full_name = ?, role = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, phone_number = ?, full_name = ?, address = ?, role = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getEmail());
-            ps.setString(2, user.getFullName());
-            ps.setString(3, user.getRole());
-            ps.setInt(4, user.getId());
+            ps.setString(2, user.getPhoneNumber());
+            ps.setString(3, user.getFullName());
+            ps.setString(4, user.getAddress());
+            ps.setString(5, user.getRole());
+            ps.setInt(6, user.getId());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

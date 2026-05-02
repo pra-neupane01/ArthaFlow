@@ -9,13 +9,14 @@ import com.arthaflow.dao.UserDAO;
 public class UserService {
     UserDAO userdao = new UserDAO();
 
-    public boolean registerNewUser(String email, String password, String fullName){
+    public boolean registerNewUser(String email, String password, String fullName, String phoneNumber, String address){
         boolean emailValidation =   ValidationService.isValidEmail( email) &&
-                                    ValidationService.isEmailExists(email);
+                                     !ValidationService.isEmailExists(email);
+        boolean phoneNumberValidation = ValidationService.isValidphoneNumber(phoneNumber);
         boolean passwordValidation = ValidationService.isValidPassword( password);
-        boolean nameValidation = fullName.isEmpty();
+        boolean nameValidation = fullName != null && !fullName.trim().isEmpty();
 
-        if(!emailValidation || !passwordValidation || !nameValidation){
+        if(!emailValidation || !passwordValidation || !nameValidation || !phoneNumberValidation){
             return false;
         }
 
@@ -25,6 +26,8 @@ public class UserService {
         user.setEmail(email);
         user.setPassword(hashedPassword);
         user.setFullName(fullName);
+        user.setPhoneNumber(phoneNumber);
+        user.setAddress(address);
         user.setRole("USER");
 
         return userdao.registerUser(user);

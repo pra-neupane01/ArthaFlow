@@ -8,18 +8,21 @@ public class Transaction {
     private String type;
     private double amount;
     private double balanceAfter;
-    private String description;
+    private String remarks;
+    private String status;
     private Timestamp transactionDate;
 
     public Transaction() {};
 
-    public Transaction(int id, int accountId, String type, double amount, double balanceAfter, String description, Timestamp transactionDate) {
+
+    public Transaction(int id, int accountId, String type, double amount, double balanceAfter, String remarks, String staus, Timestamp transactionDate) {
         this.id = id;
         this.accountId = accountId;
         this.type = type;
         this.amount = amount;
         this.balanceAfter = balanceAfter;
-        this.description = description;
+        this.remarks = remarks;
+        this.status = staus;
         this.transactionDate = transactionDate;
     }
 
@@ -63,12 +66,20 @@ public class Transaction {
         this.balanceAfter = balanceAfter;
     }
 
-    public String getDescription() {
-        return description;
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getStaus() {
+        return status;
+    }
+
+    public void setStaus(String staus) {
+        this.status = staus;
     }
 
     public Timestamp getTransactionDate() {
