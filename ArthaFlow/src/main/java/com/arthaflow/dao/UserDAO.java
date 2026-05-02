@@ -119,7 +119,7 @@ public class UserDAO {
 
     //Get all users
     public List<User> getAllUsers(){
-        String sql = "SELECT * FROM users ORDERED BY created_date DESC";
+        String sql = "SELECT * FROM users ORDER BY created_date DESC";
         List<User> users = new ArrayList<>();
         try(Connection conn = DatabaseConnection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)){
@@ -128,7 +128,7 @@ public class UserDAO {
                 User user = new User();
                 user.setId(rs.getInt("id"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("passowrd"));
+                user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("full_name"));
                 user.setRole(rs.getString("role"));
                 user.setCreatedDate(rs.getTimestamp("created_date"));
