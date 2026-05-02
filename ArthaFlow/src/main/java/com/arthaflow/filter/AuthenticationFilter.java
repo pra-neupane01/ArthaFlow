@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/user/*", "/admin/*"})
+//@WebFilter(urlPatterns = {"/user/*", "/admin/*"})
 public class AuthenticationFilter implements Filter {
 
 
