@@ -4,6 +4,8 @@ package com.arthaflow.dao;
 import com.arthaflow.model.User;
 import com.arthaflow.util.DatabaseConnection;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
 
@@ -113,5 +115,28 @@ public class UserDAO {
     // Check if email exists
     public boolean emailExists(String email) {
         return getUserByEmail(email) != null;
+    }
+
+    //Get all users
+    public List<User> getAllUsers(){
+        String sql = "SELECT * FROM users ORDERED BY created_date DESC";
+        List<User> users = new ArrayList<>();
+        try(Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("passowrd"));
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setCreatedDate(rs.getTimestamp("created_date"));
+                users.add(user);
+            }
+        }catch (SQLException e){
+            System.out.println("Error fetching all users: "+e.getMessage());
+        }
+        return users;
     }
 }
