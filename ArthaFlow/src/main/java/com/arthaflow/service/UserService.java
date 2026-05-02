@@ -4,19 +4,18 @@ import com.arthaflow.dao.UserDAO;
 import com.arthaflow.model.User;
 import com.arthaflow.util.PasswordEncryption;
 import com.arthaflow.util.ValidationService;
-import com.arthaflow.dao.UserDAO;
 
 public class UserService {
     UserDAO userdao = new UserDAO();
 
-    public boolean registerNewUser(String email, String password, String fullName, String phoneNumber, String address){
-        boolean emailValidation =   ValidationService.isValidEmail( email) &&
-                                     !ValidationService.isEmailExists(email);
+    public boolean registerNewUser(String email, String password, String fullName, String phoneNumber, String address) {
+        boolean emailValidation = ValidationService.isValidEmail(email) &&
+                !ValidationService.isEmailExists(email);
         boolean phoneNumberValidation = ValidationService.isValidphoneNumber(phoneNumber);
-        boolean passwordValidation = ValidationService.isValidPassword( password);
+        boolean passwordValidation = ValidationService.isValidPassword(password);
         boolean nameValidation = fullName != null && !fullName.trim().isEmpty();
 
-        if(!emailValidation || !passwordValidation || !nameValidation || !phoneNumberValidation){
+        if (!emailValidation || !passwordValidation || !nameValidation || !phoneNumberValidation) {
             return false;
         }
 
@@ -33,7 +32,7 @@ public class UserService {
         return userdao.registerUser(user);
     }
 
-    public User authenticateUser(String email, String password){
+    public User authenticateUser(String email, String password) {
         User user = userdao.getUserByEmail(email);
         if (user != null && PasswordEncryption.verifyPassword(password, user.getPassword())) {
             return user;
@@ -41,13 +40,20 @@ public class UserService {
         return null;
     }
 
-    public boolean updateUserProfile(int userId, String fullName, String email){
-        if(!ValidationService.isValidEmail(email)){
+    public boolean updateUserProfile(int userId, String fullName, String email) {
+        if (!ValidationService.isValidEmail(email)) {
             return false;
         }
 
-        if(ValidationService.isEmailExists(email)){
-            return false; // email already taken
+        // Get current user to check if email belongs to someone else
+        User currentUser = userdao.getUserById(userId);
+        if (currentUser == null) {
+            return false;
+        }
+
+        // Only block if email exists AND it belongs to a different user
+        if (!email.equals(currentUser.getEmail()) && ValidationService.isEmailExists(email)) {
+            return false;
         }
 
         User user = new User();
@@ -58,5 +64,4 @@ public class UserService {
 
         return userdao.updateUser(user);
     }
-
 }
