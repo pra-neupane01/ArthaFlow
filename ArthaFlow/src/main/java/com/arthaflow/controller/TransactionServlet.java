@@ -16,11 +16,11 @@ public class TransactionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
-        if("deposit".equals(action)){
+        if ("deposit".equals(action)) {
             req.getRequestDispatcher("/jsp/user/deposit.jsp").forward(req, resp);
-        }else if("withdraw".equals(action)){
+        } else if ("withdraw".equals(action)) {
             req.getRequestDispatcher("/jsp/user/withdraw.jsp").forward(req, resp);
-        }else{
+        } else {
             resp.sendRedirect(req.getContextPath() + "/user/dashboard");
         }
     }
@@ -36,41 +36,47 @@ public class TransactionServlet extends HttpServlet {
         if (description == null)
             description = "";
 
-        String jspPage = "deposit".equals(action)
-                ? "/jsp/user/deposit.jsp"
-                : "/jsp/user/withdraw.jsp";
+        String jspPage;
+        if ("deposit".equals(action)) {
+            jspPage = "/jsp/user/deposit.jsp";
+        } else {
+            jspPage = "/jsp/user/withdraw.jsp";
+        }
 
-        if(amountStr == null || amountStr.isEmpty()){
+        if (amountStr == null || amountStr.isEmpty()) {
             req.setAttribute("error", "Please enter an amount.");
             req.getRequestDispatcher(jspPage).forward(req, resp);
             return;
         }
 
         double amount;
-        try{
+        try {
             amount = Double.parseDouble(amountStr);
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             req.setAttribute("error", "Invalid amount format. Please enter a valid number.");
             req.getRequestDispatcher(jspPage).forward(req, resp);
             return;
         }
+
         if ("deposit".equals(action)) {
-            boolean success = transactionService.deposit(user.getId(), amount, description);
-            if(success){
+            boolean success = transactionService.deposit(user.getUserId(), amount, description);
+            if (success) {
                 req.setAttribute("success", "Deposit of Rs. " + amount + " was successful.");
-            }else{
+            } else {
                 req.setAttribute("error", "Deposit failed. Please try again.");
             }
             req.getRequestDispatcher("/jsp/user/deposit.jsp").forward(req, resp);
-        }else if ("withdraw".equals(action)) {
-            String result = transactionService.withdraw(user.getId(), amount, description);
-            if("success".equals(result)){
+
+        } else if ("withdraw".equals(action)) {
+            String result = transactionService.withdraw(user.getUserId(), amount, description);
+            if ("Withdrawal successful".equals(result)) {
                 req.setAttribute("success", "Withdrawal of Rs. " + amount + " was successful.");
-            }else{
+            } else {
                 req.setAttribute("error", result);
             }
             req.getRequestDispatcher("/jsp/user/withdraw.jsp").forward(req, resp);
-        }else{
+
+        } else {
             resp.sendRedirect(req.getContextPath() + "/user/dashboard");
         }
     }
