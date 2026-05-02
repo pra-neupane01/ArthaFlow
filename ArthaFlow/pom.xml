@@ -36,6 +36,12 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+<!--This one is for JDBC driver for MySQL-->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.5.0</version>
+        </dependency>
 
 <!--        This one is for bcrypt password hashing-->
         <dependency>
