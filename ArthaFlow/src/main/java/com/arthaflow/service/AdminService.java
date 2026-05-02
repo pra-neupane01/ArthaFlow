@@ -14,52 +14,51 @@ public class AdminService {
     AccountDAO accountDAO = new AccountDAO();
     TransactionDAO transactionDAO = new TransactionDAO();
 
-    //Get all users
-    public List<User> getAllUsers(){
+    // Get all users
+    public List<User> getAllUsers() {
         return userDAO.getAllUsers();
     }
 
-    //Get all accounts
-    public List<Account> getAllAccounts(){
+    // Get all accounts
+    public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
     }
 
-    //Get all transactions
-    public List<Transaction> getAllTransactions(){
+    // Get all transactions
+    public List<Transaction> getAllTransactions() {
         return transactionDAO.getAllTransactions();
     }
 
-    //Delete a user and thier account
-    public boolean deleteUser(int userId){
+    // Delete a user and their account
+    public boolean deleteUser(int userId) {
         Account account = accountDAO.getAccountByUserId(userId);
-        if(account != null){
-            accountDAO.deleteAccount(account.getId());
+        if (account != null) {
+            accountDAO.deleteAccount(account.getAccountId());
         }
         return userDAO.deleteUser(userId);
     }
 
-    //Total deposits across all accounts
-    public double getTotalDeposits(){
+    // Total deposits across all accounts
+    public double getTotalDeposits() {
         List<Transaction> all = transactionDAO.getAllTransactions();
         double total = 0;
-        for(Transaction t : all){
-            if("DEPOSIT".equals(t.getType())){
+        for (Transaction t : all) {
+            if ("DEPOSIT".equals(t.getType())) {
                 total += t.getAmount();
             }
         }
         return total;
     }
 
-    //Total withdrawals across all accounts
-    public double getTotalWithdrawals(){
+    // Total withdrawals across all accounts
+    public double getTotalWithdrawals() {
         List<Transaction> all = transactionDAO.getAllTransactions();
         double total = 0;
-        for(Transaction t : all){
-            if("WITHDRAW".equals(t.getType())){
+        for (Transaction t : all) {
+            if ("WITHDRAWAL".equals(t.getType())) {
                 total += t.getAmount();
             }
         }
         return total;
     }
-
 }
