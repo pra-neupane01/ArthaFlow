@@ -39,7 +39,7 @@ public class UserDAO {
 
             if (rs.next()) {
                 User user = new User();
-                user.setId(rs.getInt("id"));
+                user.setUserId(rs.getInt("user_id"));
                 user.setEmail(rs.getString("email"));
                 user.setPassword(rs.getString("password"));
                 user.setPhoneNumber(rs.getString("phone_number"));
@@ -56,17 +56,17 @@ public class UserDAO {
     }
 
     // Get user by id
-    public User getUserById(int id) {
-        String sql = "SELECT * FROM users WHERE id = ?";
+    public User getUserById(int userId) {
+        String sql = "SELECT * FROM users WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, id);
+            ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 User user = new User();
-                user.setId(rs.getInt("id"));
+                user.setUserId(rs.getInt("user_id"));
                 user.setEmail(rs.getString("email"));
                 user.setPassword(rs.getString("password"));
                 user.setPhoneNumber(rs.getString("phone_number"));
@@ -85,7 +85,7 @@ public class UserDAO {
 
     // Update user
     public boolean updateUser(User user) {
-        String sql = "UPDATE users SET email = ?, phone_number = ?, full_name = ?, address = ?, role = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, phone_number = ?, full_name = ?, address = ?, role = ? WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -94,7 +94,7 @@ public class UserDAO {
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getAddress());
             ps.setString(5, user.getRole());
-            ps.setInt(6, user.getId());
+            ps.setInt(6, user.getUserId());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -105,12 +105,12 @@ public class UserDAO {
     }
 
     // Delete user
-    public boolean deleteUser(int id) {
-        String sql = "DELETE FROM users WHERE id = ?";
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM users WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, id);
+            ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error while removing User"+e.getMessage());

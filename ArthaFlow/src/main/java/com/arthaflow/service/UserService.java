@@ -41,7 +41,7 @@ public class UserService {
         return null;
     }
 
-    public boolean updateUserProfile(int id, String fullName, String email){
+    public boolean updateUserProfile(int userId, String fullName, String email){
         if(!ValidationService.isValidEmail(email)){
             return false;
         }
@@ -51,7 +51,7 @@ public class UserService {
         }
 
         User user = new User();
-        user.setId( id);
+        user.setUserId(userId);
         user.setEmail(email);
         user.setFullName(fullName);
         user.setRole("USER");
