@@ -17,16 +17,18 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/register/register.jsp").forward(req, resp);
+        req.getRequestDispatcher("/jsp/user/register.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String fullName = req.getParameter("fullName");
         String email = req.getParameter("email");
+        String phoneNumber = req.getParameter("phoneNumber");
         String password = req.getParameter("password");
+        String address = req.getParameter("address");
 
-        boolean success = userService.registerNewUser(email, password,fullName);
+        boolean success = userService.registerNewUser(email, password,fullName, phoneNumber, address);
 
         if(success){
             req.setAttribute("Success Message","Registration successful! Please Login to continue service.");

@@ -44,6 +44,14 @@
             <version>0.4</version>
         </dependency>
 
+<!--        My Sql connection-->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
