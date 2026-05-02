@@ -25,6 +25,10 @@ public class Account {
         return accountId;
     }
 
+    public int getId() {
+        return accountId;
+    }
+
     public void setAccountId(int accountId) {
         this.accountId = accountId;
     }

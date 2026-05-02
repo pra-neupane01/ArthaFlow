@@ -14,16 +14,14 @@ import java.io.IOException;
 public class AccountServlet extends HttpServlet {
     AccountService accountService = new AccountService();
 
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
 
-        Account account = accountService.getAccountDetails(user.getId());
+        Account account = accountService.getAccountDetails(user.getUserId());
         req.setAttribute("account", account);
         req.getRequestDispatcher("/jsp/user/accountDetails.jsp").forward(req, resp);
-
     }
 
     @Override
@@ -33,16 +31,16 @@ public class AccountServlet extends HttpServlet {
 
         String accountType = req.getParameter("accountType");
 
-        if(accountType == null || accountType.isEmpty()){
+        if (accountType == null || accountType.isEmpty()) {
             req.setAttribute("error", "Please select an account type.");
             req.getRequestDispatcher("/jsp/user/accountDetails.jsp").forward(req, resp);
             return;
         }
 
-        boolean created = accountService.createNewAccount(user.getId(), accountType);
-        if(created){
+        boolean created = accountService.createNewAccount(user.getUserId(), accountType);
+        if (created) {
             resp.sendRedirect(req.getContextPath() + "/user/account");
-        }else{
+        } else {
             req.setAttribute("error", "Account already exists or could not be created.");
             req.getRequestDispatcher("/jsp/user/accountDetails.jsp").forward(req, resp);
         }

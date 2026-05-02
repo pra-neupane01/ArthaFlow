@@ -15,13 +15,12 @@ import java.util.List;
 public class SearchServlet extends HttpServlet {
     TransactionService transactionService = new TransactionService();
 
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         User user = (User) session.getAttribute("user");
 
-        List<Transaction> transactions = transactionService.getTransactionHistory(user.getId());
+        List<Transaction> transactions = transactionService.getTransactionHistory(user.getUserId());
         req.setAttribute("transactions", transactions);
         req.getRequestDispatcher("/jsp/user/transactionHistory.jsp").forward(req, resp);
     }
@@ -41,7 +40,7 @@ public class SearchServlet extends HttpServlet {
                 req.getRequestDispatcher("/jsp/user/transactionHistory.jsp").forward(req, resp);
                 return;
             }
-            results = transactionService.searchByType(user.getId(), transactionType);
+            results = transactionService.searchByType(user.getUserId(), transactionType);
 
         } else if ("date".equals(searchType)) {
             String fromDate = req.getParameter("fromDate");
@@ -51,11 +50,12 @@ public class SearchServlet extends HttpServlet {
                 req.getRequestDispatcher("/jsp/user/transactionHistory.jsp").forward(req, resp);
                 return;
             }
-            results = transactionService.searchByDate(user.getId(), fromDate, toDate);
+            results = transactionService.searchByDate(user.getUserId(), fromDate, toDate);
 
         } else {
-            results = transactionService.getTransactionHistory(user.getId());
+            results = transactionService.getTransactionHistory(user.getUserId());
         }
+
         if (results == null || results.isEmpty()) {
             req.setAttribute("info", "No transactions found.");
         }

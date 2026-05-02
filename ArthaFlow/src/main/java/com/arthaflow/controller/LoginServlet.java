@@ -5,14 +5,12 @@ import com.arthaflow.service.UserService;
 import com.arthaflow.util.CookieUtil;
 import com.arthaflow.util.SessionService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-//@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     UserService userservice = new UserService();
 
@@ -27,19 +25,18 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
 
         User user = userservice.authenticateUser(email, password);
-        if(user != null){
+        if (user != null) {
             SessionService.setUserSession(req, user);
             CookieUtil.setUserCookie(resp, email);
 
-            if("ADMIN".equals(user.getRole())){
+            if ("ADMIN".equals(user.getRole())) {
                 resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
-            }else {
+            } else {
                 resp.sendRedirect(req.getContextPath() + "/user/dashboard");
             }
         } else {
-            req.setAttribute("Error Message","Invalid Email or Password");
+            req.setAttribute("error", "Invalid Email or Password");
             req.getRequestDispatcher("/jsp/user/login.jsp").forward(req, resp);
         }
-
     }
 }

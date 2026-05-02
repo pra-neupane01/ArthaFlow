@@ -12,7 +12,7 @@ public class TransactionService {
     AccountDAO accountDAO = new AccountDAO();
     TransactionDAO transactionDAO = new TransactionDAO();
 
-    //Deposit method
+    // Deposit money into account
     public boolean deposit(int userId, double amount, String description) {
         if (amount <= 0) {
             return false;
@@ -23,67 +23,67 @@ public class TransactionService {
         }
         double newBalance = account.getBalance() + amount;
 
-        boolean balanceUpdated = accountDAO.updateBalance(account.getId(), newBalance);
+        boolean balanceUpdated = accountDAO.updateBalance(account.getAccountId(), newBalance);
         if (!balanceUpdated) {
             return false;
         }
         Transaction transaction = new Transaction(
-                0, account.getId(), "DEPOSIT", amount, newBalance,
-                description.isEmpty() ? "Deposit" : description, null
+                0, account.getAccountId(), "DEPOSIT", amount, newBalance,
+                description.isEmpty() ? "Deposit" : description, "SUCCESS", null
         );
         return transactionDAO.addTransaction(transaction);
     }
 
-    //Withdrawal method
-    public String withdraw(int userId, double amount, String description){
-        if (amount <=0){
+    // Withdraw money from account — returns "Withdrawal successful" or an error message
+    public String withdraw(int userId, double amount, String description) {
+        if (amount <= 0) {
             return "Amount must be greater than zero";
         }
         Account account = accountDAO.getAccountByUserId(userId);
-        if(account == null){
+        if (account == null) {
             return "Account not found";
         }
-        if(account.getBalance() < amount){
+        if (account.getBalance() < amount) {
             return "Insufficient balance";
         }
         double newBalance = account.getBalance() - amount;
 
-        boolean balanceUpdated = accountDAO.updateBalance(account.getId(), newBalance);
-        if(!balanceUpdated){
+        boolean balanceUpdated = accountDAO.updateBalance(account.getAccountId(), newBalance);
+        if (!balanceUpdated) {
             return "Withdrawal failed. Please try again.";
         }
         Transaction transaction = new Transaction(
-                0, account.getId(), "WITHDRAW", amount, newBalance,
-                description.isEmpty() ? "Withdrawal" : description, null
+                0, account.getAccountId(), "WITHDRAWAL", amount, newBalance,
+                description.isEmpty() ? "Withdrawal" : description, "SUCCESS", null
         );
         transactionDAO.addTransaction(transaction);
         return "Withdrawal successful";
     }
 
-    //Get transaction history
-    public List<Transaction> getTransactionHistory(int userId){
+    // Get full transaction history for a user
+    public List<Transaction> getTransactionHistory(int userId) {
         Account account = accountDAO.getAccountByUserId(userId);
         if (account == null) {
             return new ArrayList<>();
         }
-        return transactionDAO.getTransactionsByAccountId(account.getId());
+        return transactionDAO.getTransactionsByAccountId(account.getAccountId());
     }
 
-    //Search transaction by type (Deposit / Withdrawal)
-    public List<Transaction> searchByType(int userId, String type){
+    // Search by transaction type (DEPOSIT or WITHDRAWAL)
+    public List<Transaction> searchByType(int userId, String type) {
         Account account = accountDAO.getAccountByUserId(userId);
-        if(account == null){
+        if (account == null) {
             return new ArrayList<>();
         }
-        return transactionDAO.searchByType(account.getId(), type);
+        return transactionDAO.searchByType(account.getAccountId(), type);
     }
 
-//Search transaction by date range
-    public List<Transaction> searchByDate(int userId, String fromDate, String toDate){
+    // Search by date range
+    public List<Transaction> searchByDate(int userId, String fromDate, String toDate) {
         Account account = accountDAO.getAccountByUserId(userId);
-        if(account == null){
+        if (account == null) {
             return new ArrayList<>();
         }
-        return transactionDAO.searchByDate(account.getId(), fromDate, toDate);
+        return transactionDAO.searchByDate(account.getAccountId(), fromDate, toDate);
     }
 }
