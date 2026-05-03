@@ -44,7 +44,7 @@
         <a href="<%= request.getContextPath() %>/user/dashboard">Back to Dashboard</a>
     </form>
 </div>
-<script src="<%= request.getContextPath() %>/js/dashboard.js"></script>
+<script src="<%= request.getContextPath() %>/JS/dashboard.js"></script>
 </body>
 </html>
 
