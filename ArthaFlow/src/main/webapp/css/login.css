@@ -1,0 +1,21 @@
+.login-box {
+    width: 380px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    box-shadow: 0 0 10px #ccc;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.login-box h2 {
+    margin-bottom: 20px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
