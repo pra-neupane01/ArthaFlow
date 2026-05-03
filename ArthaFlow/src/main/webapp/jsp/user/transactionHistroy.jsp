@@ -72,6 +72,6 @@
     <br>
     <a href="<%= request.getContextPath() %>/user/dashboard">Back to Dashboard</a>
 </div>
-<script src="<%= request.getContextPath() %>/js/search.js"></script>
+<script src="<%= request.getContextPath() %>src/main/webapp/JS/search.js"></script>
 </body>
 </html>
