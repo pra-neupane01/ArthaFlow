@@ -1,19 +1,3 @@
-<%--&lt;%&ndash;--%>
-<%--  Created by IntelliJ IDEA.--%>
-<%--  User: neupa--%>
-<%--  Date: 4/28/2026--%>
-<%--  Time: 10:55 AM--%>
-<%--  To change this template use File | Settings | File Templates.--%>
-<%--&ndash;%&gt;--%>
-<%--<%@ page contentType="text/html;charset=UTF-8" language="java" %>--%>
-<%--<html>--%>
-<%--<head>--%>
-<%--    <title>Login Page</title>--%>
-<%--</head>--%>
-<%--<body>--%>
-<%--&lt;%&ndash;&ndash;%&gt;--%>
-<%--</body>--%>
-<%--</html>--%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html>

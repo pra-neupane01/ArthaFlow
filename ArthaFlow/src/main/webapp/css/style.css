@@ -36,22 +36,23 @@ a {
 .navbar {
     height: 70px;
     padding: 0 30px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
 .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--primary);
+    color: white;
 }
 
-.nav-links {
-    display: flex;
-    gap: 30px;
+.nav-links a {
+    color: rgba(255,255,255,0.85);
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+    color: white;
 }
 
 .nav-links a {
@@ -72,16 +73,11 @@ a {
 }
 
 .login-link {
-    color: var(--text-main);
-    font-size: 14px;
-}
-
-.register-btn {
-    background: var(--primary);
     color: white;
-    padding: 10px 22px;
-    border-radius: 25px;
-    transition: 0.3s;
+}
+.register-btn {
+    background: white;
+    color: var(--primary);
 }
 
 .register-btn:hover {
@@ -277,20 +273,21 @@ a {
 /* FOOTER */
 .footer {
     padding: 40px 28px;
-    background: var(--white);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: white;
 }
-
 .footer p {
-    color: var(--text-muted);
-    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+}
+.footer-links a {
+    color: rgba(255,255,255,0.85);
 }
 
-.footer-links {
-    display: flex;
-    gap: 25px;
+.footer-links a:hover {
+    color: white;
 }
 
 .footer-links a {
