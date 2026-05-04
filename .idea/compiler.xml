@@ -4,5 +4,13 @@
     <bytecodeTargetLevel>
       <module name="ArthaFlow" target="25" />
     </bytecodeTargetLevel>
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="ArthaFlow" />
+      </profile>
+    </annotationProcessing>
   </component>
 </project>
