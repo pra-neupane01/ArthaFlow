@@ -6,13 +6,12 @@ import com.arthaflow.model.Account;
 public class AccountService {
     AccountDAO accountDAO = new AccountDAO();
 
-    // Create a new account — one account per user only
-    public boolean createNewAccount(int userId, String accountType) {
-        Account existing = accountDAO.getAccountByUserId(userId);
+    // Create a new account request with KYC
+    public boolean createNewAccount(Account account) {
+        Account existing = accountDAO.getAccountByUserId(account.getUserId());
         if (existing != null) {
             return false;
         }
-        Account account = new Account(0, null, userId, 0.00, accountType, "ACTIVE", null);
         return accountDAO.createAccount(account);
     }
 
@@ -24,7 +23,7 @@ public class AccountService {
     // View current balance
     public double viewBalance(int userId) {
         Account account = accountDAO.getAccountByUserId(userId);
-        if (account != null) {
+        if (account != null && "ACTIVE".equals(account.getStatus())) {
             return account.getBalance();
         }
         return -1;

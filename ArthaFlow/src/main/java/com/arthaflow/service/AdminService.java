@@ -38,6 +38,21 @@ public class AdminService {
         return userDAO.deleteUser(userId);
     }
 
+    // Approve an account (simplified)
+    public boolean approveAccount(int accountId) {
+        return accountDAO.updateStatus(accountId, "ACTIVE");
+    }
+
+    // Issue Account Number and Approve KYC
+    public boolean issueAccountNumber(int accountId, String accountNumber) {
+        return accountDAO.issueAccountNumber(accountId, accountNumber);
+    }
+
+    // Reject an account
+    public boolean rejectAccount(int accountId) {
+        return accountDAO.updateStatus(accountId, "REJECTED");
+    }
+
     // Total deposits across all accounts
     public double getTotalDeposits() {
         List<Transaction> all = transactionDAO.getAllTransactions();
