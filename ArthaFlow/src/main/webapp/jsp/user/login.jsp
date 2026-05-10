@@ -1,61 +1,65 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - ArthaFlow</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | ArthaFlow</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/premium.css">
 </head>
 <body>
-
-<div class="login-page">
-
-    <div class="brand">
-        <h1>ArthaFlow</h1>
-        <p>Secure Digital Banking Access</p>
+<div class="auth-page">
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+        <div style="margin-bottom: 3rem;">
+            <a href="<%= request.getContextPath() %>/" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 3rem;">
+                <div class="logo-mark" style="width:42px;height:42px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.2rem;">A</div>
+                <span style="color:white;font-weight:800;font-size:1.2rem;">ArthaFlow</span>
+            </a>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 1rem;">Welcome back to ArthaFlow</h2>
+            <p style="font-size: 1rem; opacity: 0.8; line-height: 1.7;">Nepal's most trusted digital banking platform. Secure, fast, and always with you.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.08); border-radius: 16px; padding: 1.5rem;">
+            <div style="font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Trusted By</div>
+            <div style="font-weight: 600; font-size: 0.95rem;">🎓 Itahari International College</div>
+            <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 0.25rem;">Faculty & Students</div>
+        </div>
     </div>
 
-    <div class="login-card">
-        <h2>Welcome back</h2>
-        <p class="subtitle">Please enter your credentials to continue</p>
-
-        <div id="loginError" class="error-box" style="display:none;">
-            <strong>Invalid Email or Password</strong>
-            <span>Please check your details and try again.</span>
+    <!-- RIGHT PANEL (FORM) -->
+    <div class="auth-right">
+        <div style="margin-bottom: 2rem;">
+            <h2>Namaste! 🙏</h2>
+            <p class="auth-sub">Enter your credentials to access your account.</p>
         </div>
 
-        <form action="${pageContext.request.contextPath}/login"
-              method="post"
-              onsubmit="return validateLoginForm()"
-              novalidate>
+        <% if (request.getAttribute("error") != null) { %>
+            <div class="alert alert-danger">⚠ <%= request.getAttribute("error") %></div>
+        <% } %>
+        <% if (request.getAttribute("success") != null) { %>
+            <div class="alert alert-success">✓ <%= request.getAttribute("success") %></div>
+        <% } %>
 
-            <label>Email Address</label>
-            <input type="email" id="email" name="email" placeholder="yourname@gmail.com">
-
-            <div class="password-row">
-                <label>Password</label>
-                <a href="#">Forgot Password?</a>
+        <form action="<%= request.getContextPath() %>/login" method="POST">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" required placeholder="your@email.com">
             </div>
-
-            <input type="password" id="password" name="password" placeholder="••••••••">
-
-            <div class="remember-row">
-                <input type="checkbox" id="remember">
-                <label for="remember">Stay logged in for 30 days</label>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="Enter your password">
             </div>
-
-            <button type="submit">Login to Dashboard →</button>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top: 0.5rem; padding: 0.85rem;">
+                Login to ArthaFlow
+            </button>
         </form>
 
-        <p class="register-text">
+        <div class="divider"></div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">
             New to ArthaFlow?
-            <a href="${pageContext.request.contextPath}/jsp/user/register.jsp">Open Account</a>
+            <a href="<%= request.getContextPath() %>/register" style="color: var(--primary); font-weight: 600; text-decoration: none;">Open a free account →</a>
         </p>
     </div>
-
-    <p class="security-text"> AES-256 Bank-Grade Encryption</p>
-
 </div>
-
-<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>

@@ -12,20 +12,27 @@ import java.util.List;
 
 public class TransactionDAO {
 
-    // Add a new transaction record
-    public boolean addTransaction(Transaction transaction) {
-        String sql = "INSERT INTO transactions (account_id, type, amount, balance_after, remarks) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    // Add a new transaction record - supports transactions
+    public boolean addTransaction(Transaction transaction, Connection conn) throws SQLException {
+        String sql = "INSERT INTO transactions (account_id, type, amount, balance_after, remarks, status) VALUES (?, ?, ?, ?, ?, ?)";
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, transaction.getAccountId());
             ps.setString(2, transaction.getType());
             ps.setDouble(3, transaction.getAmount());
             ps.setDouble(4, transaction.getBalanceAfter());
             ps.setString(5, transaction.getRemarks());
+            ps.setString(6, transaction.getStatus());
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error adding transaction: " + e.getMessage());
-            return false;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
         }
     }
 

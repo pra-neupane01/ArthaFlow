@@ -1,106 +1,76 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register - ArthaFlow</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/register.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | ArthaFlow</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/premium.css">
 </head>
 <body>
-
-<header class="register-navbar">
-    <div class="logo">ArthaFlow</div>
-
-    <nav>
-        <a href="${pageContext.request.contextPath}/index.jsp">Home</a>
-        <a href="#">Dashboard</a>
-        <a href="#">Payments</a>
-        <a href="#">History</a>
-        <a href="#">Support</a>
-    </nav>
-
-    <div class="nav-actions">
-        <a href="${pageContext.request.contextPath}/jsp/user/login.jsp" class="login-link">Login</a>
-        <a href="${pageContext.request.contextPath}/jsp/user/register.jsp" class="open-btn">Open Account</a>
+<div class="auth-page">
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+        <a href="<%= request.getContextPath() %>/" style="text-decoration:none;display:flex;align-items:center;gap:0.75rem;margin-bottom:3rem;">
+            <div style="width:42px;height:42px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.2rem;">A</div>
+            <span style="color:white;font-weight:800;font-size:1.2rem;">ArthaFlow</span>
+        </a>
+        <h2 style="font-size:2rem;font-weight:800;margin-bottom:1rem;">Start your banking journey</h2>
+        <p style="opacity:0.8;line-height:1.7;margin-bottom:2rem;">Join hundreds of students and professionals from Itahari International College who already trust ArthaFlow.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;"><span>✅</span><span style="opacity:0.9;">Free account opening</span></div>
+            <div style="display:flex;align-items:center;gap:0.75rem;"><span>🔒</span><span style="opacity:0.9;">KYC-verified security</span></div>
+            <div style="display:flex;align-items:center;gap:0.75rem;"><span>💳</span><span style="opacity:0.9;">Credit card eligibility</span></div>
+        </div>
     </div>
-</header>
 
-<main class="register-page">
+    <!-- RIGHT PANEL -->
+    <div class="auth-right" style="width:540px; overflow-y:auto;">
+        <h2>Create Your Account</h2>
+        <p class="auth-sub">Fill in your details to get started. All amounts in NPR (Rs.).</p>
 
-    <section class="register-info">
-        <h1>Start your financial journey with ArthaFlow.</h1>
-        <p>
-            Join users managing their accounts with secure digital banking
-            and modern financial tools.
-        </p>
+        <% if (request.getAttribute("error") != null) { %>
+            <div class="alert alert-danger">⚠ <%= request.getAttribute("error") %></div>
+        <% } %>
 
-        <div class="info-item">
-            <span>✓</span>
-            <p>Institutional-grade encryption</p>
-        </div>
+        <form action="<%= request.getContextPath() %>/register" method="POST">
+            <div class="form-group">
+                <label class="form-label">Full Name (as per ID)</label>
+                <input type="text" name="fullName" class="form-control" required placeholder="Ex: Rajesh Kumar Hamal">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-prefix">+977</span>
+                        <input type="tel" name="phoneNumber" class="form-control" required placeholder="98XXXXXXXX">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Current Address</label>
+                <input type="text" name="address" class="form-control" required placeholder="Ex: Sundar Haraicha 04, Dulari, Itahari">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="Min 8 chars, upper+lower+number+special">
+            </div>
 
-        <div class="info-item">
-            <span>✓</span>
-            <p>Real-time banking access</p>
-        </div>
-    </section>
-
-    <section class="register-card">
-        <h2>Create Account</h2>
-        <p class="subtitle">Secure access to your ArthaFlow banking dashboard.</p>
-
-        <div id="registerError" class="error-box" style="display:none;">
-            <strong>Invalid Registration Details</strong>
-            <span>Please check your email, password, and confirmation.</span>
-        </div>
-
-        <form action="${pageContext.request.contextPath}/jsp/user/userDashboard.jsp"
-              method="post"
-              onsubmit="return validateRegisterForm()"
-              novalidate>
-
-            <label>Full Name</label>
-            <input type="text" id="fullName" name="fullName" placeholder="syaron Rai">
-
-            <label>Email Address</label>
-            <input type="email" id="registerEmail" name="email" placeholder="yourname@gmail.com">
-
-            <label>Password</label>
-            <input type="password" id="registerPassword" name="password" placeholder="......">
-
-            <label>Confirm Password</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="......">
-
-            <button type="submit">Register</button>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top: 0.5rem; padding: 0.85rem;">
+                Register Now →
+            </button>
         </form>
 
-        <p class="register-text">
+        <div class="divider"></div>
+        <p style="text-align:center;color:var(--text-muted);font-size:0.9rem;">
             Already have an account?
-            <a href="${pageContext.request.contextPath}/jsp/user/login.jsp">Login</a>
+            <a href="<%= request.getContextPath() %>/login" style="color:var(--primary);font-weight:600;text-decoration:none;">Sign In</a>
         </p>
-
-        <p class="terms">
-            By registering, you agree to our
-            <a href="#">Terms of Service</a> and
-            <a href="#">Privacy Policy</a>.
-        </p>
-    </section>
-
-</main>
-
-<footer class="register-footer">
-    <div>
-        <h3>ArthaFlow</h3>
-        <p>© 2026 ArthaFlow | Secure Financial Management</p>
     </div>
-
-    <div class="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Security</a>
-        <a href="#">Cookie Settings</a>
-    </div>
-</footer>
-
-<script src="${pageContext.request.contextPath}/js/validation.js"></script>
+</div>
 </body>
 </html>

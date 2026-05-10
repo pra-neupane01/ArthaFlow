@@ -8,56 +8,87 @@ import com.arthaflow.model.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class handling all financial transactions.
+ */
 public class TransactionService {
     AccountDAO accountDAO = new AccountDAO();
     TransactionDAO transactionDAO = new TransactionDAO();
 
-    // Deposit money into account
+    // Deposit money into account - Uses Database Transactions for ACID
     public boolean deposit(int userId, double amount, String description) {
-        if (amount <= 0) {
-            return false;
-        }
-        Account account = accountDAO.getAccountByUserId(userId);
-        if (account == null) {
-            return false;
-        }
-        double newBalance = account.getBalance() + amount;
+        if (amount <= 0) return false;
 
-        boolean balanceUpdated = accountDAO.updateBalance(account.getAccountId(), newBalance);
-        if (!balanceUpdated) {
+        Account account = accountDAO.getAccountByUserId(userId);
+        if (account == null || !"ACTIVE".equals(account.getStatus())) {
             return false;
         }
-        Transaction transaction = new Transaction(
-                0, account.getAccountId(), "DEPOSIT", amount, newBalance,
-                description.isEmpty() ? "Deposit" : description, "SUCCESS", null
-        );
-        return transactionDAO.addTransaction(transaction);
+        
+        if (!"APPROVED".equals(account.getKycStatus())) {
+            System.out.println("Transaction blocked: KYC not approved for user " + userId);
+            return false;
+        }
+
+        double newBalance = account.getBalance() + amount;
+        
+        try (java.sql.Connection conn = com.arthaflow.util.DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                if (accountDAO.updateBalance(account.getAccountId(), newBalance, conn)) {
+                    Transaction transaction = new Transaction(
+                            0, account.getAccountId(), "DEPOSIT", amount, newBalance,
+                            description == null || description.isEmpty() ? "Deposit" : description, "SUCCESS", null
+                    );
+                    if (transactionDAO.addTransaction(transaction, conn)) {
+                        conn.commit();
+                        return true;
+                    }
+                }
+                conn.rollback();
+            } catch (java.sql.SQLException e) {
+                if (conn != null) conn.rollback();
+                System.out.println("Deposit transaction failed: " + e.getMessage());
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Database error during deposit: " + e.getMessage());
+        }
+        return false;
     }
 
-    // Withdraw money from account — returns "Withdrawal successful" or an error message
+    // Withdraw money from account - Uses Database Transactions for ACID
     public String withdraw(int userId, double amount, String description) {
-        if (amount <= 0) {
-            return "Amount must be greater than zero";
-        }
+        if (amount <= 0) return "Amount must be greater than zero";
+
         Account account = accountDAO.getAccountByUserId(userId);
-        if (account == null) {
-            return "Account not found";
-        }
-        if (account.getBalance() < amount) {
-            return "Insufficient balance";
-        }
+        if (account == null) return "Account not found";
+        if (!"ACTIVE".equals(account.getStatus())) return "Account is not active";
+        if (!"APPROVED".equals(account.getKycStatus())) return "KYC verification pending. Please complete KYC to transact.";
+        if (account.getBalance() < amount) return "Insufficient balance";
+
         double newBalance = account.getBalance() - amount;
 
-        boolean balanceUpdated = accountDAO.updateBalance(account.getAccountId(), newBalance);
-        if (!balanceUpdated) {
-            return "Withdrawal failed. Please try again.";
+        try (java.sql.Connection conn = com.arthaflow.util.DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                if (accountDAO.updateBalance(account.getAccountId(), newBalance, conn)) {
+                    Transaction transaction = new Transaction(
+                            0, account.getAccountId(), "WITHDRAWAL", amount, newBalance,
+                            description == null || description.isEmpty() ? "Withdrawal" : description, "SUCCESS", null
+                    );
+                    if (transactionDAO.addTransaction(transaction, conn)) {
+                        conn.commit();
+                        return "Withdrawal successful";
+                    }
+                }
+                conn.rollback();
+            } catch (java.sql.SQLException e) {
+                if (conn != null) conn.rollback();
+                System.out.println("Withdrawal transaction failed: " + e.getMessage());
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Database error during withdrawal: " + e.getMessage());
         }
-        Transaction transaction = new Transaction(
-                0, account.getAccountId(), "WITHDRAWAL", amount, newBalance,
-                description.isEmpty() ? "Withdrawal" : description, "SUCCESS", null
-        );
-        transactionDAO.addTransaction(transaction);
-        return "Withdrawal successful";
+        return "Withdrawal failed. Please try again.";
     }
 
     // Get full transaction history for a user

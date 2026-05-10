@@ -61,6 +61,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>UserDashboardServlet</servlet-name>
+        <servlet-class>com.arthaflow.controller.UserDashboardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserDashboardServlet</servlet-name>
+        <url-pattern>/user/dashboard</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>AdminServlet</servlet-name>
         <servlet-class>com.arthaflow.controller.AdminServlet</servlet-class>
     </servlet>
@@ -69,6 +78,23 @@
         <url-pattern>/admin/dashboard</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>CreditCardServlet</servlet-name>
+        <servlet-class>com.arthaflow.controller.CreditCardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreditCardServlet</servlet-name>
+        <url-pattern>/user/creditCard</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-class>com.arthaflow.controller.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProfileServlet</servlet-name>
+        <url-pattern>/user/profile</url-pattern>
+    </servlet-mapping>
 
     <filter>
         <filter-name>AuthenticationFilter</filter-name>

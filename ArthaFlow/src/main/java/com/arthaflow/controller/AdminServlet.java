@@ -23,6 +23,11 @@ public class AdminServlet extends HttpServlet {
             req.setAttribute("transactions", adminService.getAllTransactions());
             req.getRequestDispatcher("/jsp/admin/transactionHistory.jsp").forward(req, resp);
 
+        }else if("creditCards".equals(action)){
+            com.arthaflow.service.CreditCardService ccs = new com.arthaflow.service.CreditCardService();
+            req.setAttribute("cardRequests", ccs.getAllRequests());
+            req.getRequestDispatcher("/jsp/admin/creditCardManagement.jsp").forward(req, resp);
+
         }else if("reports".equals(action)){
             req.setAttribute("totalDeposits", adminService.getTotalDeposits());
             req.setAttribute("totalWithdrawals", adminService.getTotalWithdrawals());
@@ -58,7 +63,49 @@ public class AdminServlet extends HttpServlet {
             }else{
                 resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error=Failed+to+delete+user.");
             }
-        }else{
+        } else if ("approveAccount".equals(action)) {
+            int accountId = Integer.parseInt(req.getParameter("accountId"));
+            if (adminService.approveAccount(accountId)) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&success=Account+approved+successfully.");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error=Failed+to+approve+account.");
+            }
+        } else if ("issueAccountNumber".equals(action)) {
+            int accountId = Integer.parseInt(req.getParameter("accountId"));
+            String accountNumber = req.getParameter("accountNumber");
+            if (accountNumber == null || accountNumber.trim().isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error=Account+number+is+required.");
+                return;
+            }
+            if (adminService.issueAccountNumber(accountId, accountNumber)) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&success=Account+issued+successfully.");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error=Failed+to+issue+account+number.");
+            }
+        } else if ("rejectAccount".equals(action)) {
+            int accountId = Integer.parseInt(req.getParameter("accountId"));
+            if (adminService.rejectAccount(accountId)) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&success=Account+rejected+successfully.");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error=Failed+to+reject+account.");
+            }
+        } else if ("approveCard".equals(action)) {
+            int cardId = Integer.parseInt(req.getParameter("cardId"));
+            com.arthaflow.service.CreditCardService ccs = new com.arthaflow.service.CreditCardService();
+            if (ccs.approveCard(cardId)) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=creditCards&success=Card+approved.");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=creditCards&error=Failed+to+approve.");
+            }
+        } else if ("rejectCard".equals(action)) {
+            int cardId = Integer.parseInt(req.getParameter("cardId"));
+            com.arthaflow.service.CreditCardService ccs = new com.arthaflow.service.CreditCardService();
+            if (ccs.rejectCard(cardId)) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=creditCards&success=Card+rejected.");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=creditCards&error=Failed+to+reject.");
+            }
+        } else {
             resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
         }
     }

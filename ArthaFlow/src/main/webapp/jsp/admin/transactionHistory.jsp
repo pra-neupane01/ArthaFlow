@@ -1,0 +1,61 @@
+<%@ page import="com.arthaflow.model.User" %>
+<%@ page import="com.arthaflow.model.Transaction" %>
+<%@ page import="java.util.List" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    User admin = (User) session.getAttribute("user");
+    if (admin == null || !"ADMIN".equals(admin.getRole())) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+    List<Transaction> transactions = (List<Transaction>) request.getAttribute("transactions");
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Logs | ArthaFlow Admin</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/premium.css">
+</head>
+<body>
+<div class="page-wrapper">
+    <jsp:include page="adminSidebar.jsp" />
+    <div class="main-content">
+        <div class="top-navbar">
+            <div><h2 style="font-size:1rem;font-weight:700;">System Transaction Logs</h2><p style="font-size:0.78rem;color:var(--text-muted);">All transactions across the ArthaFlow network</p></div>
+            <div class="navbar-user">
+                <div class="navbar-avatar" style="background:var(--danger);">A</div>
+                <div><div class="navbar-name"><%= admin.getFullName() %></div><div class="navbar-role">Administrator</div></div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="page-header"><h1>Global Transaction Logs</h1><p>All deposits and withdrawals across the ArthaFlow network in NPR.</p></div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>TX ID</th><th>Account</th><th>Type</th><th>Amount (Rs.)</th><th>Balance After</th><th>Date</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                        <% if (transactions != null && !transactions.isEmpty()) {
+                               for (Transaction t : transactions) { %>
+                        <tr>
+                            <td class="text-muted">#<%= t.getTransactionId() %></td>
+                            <td>Acc #<%= t.getAccountId() %></td>
+                            <td><span class="badge <%= "DEPOSIT".equals(t.getType()) ? "badge-success" : "badge-danger" %>"><%= t.getType() %></span></td>
+                            <td class="fw-bold <%= "DEPOSIT".equals(t.getType()) ? "text-green" : "text-danger" %>">
+                                Rs. <%= String.format("%,.2f", t.getAmount()) %>
+                            </td>
+                            <td>Rs. <%= String.format("%,.2f", t.getBalanceAfter()) %></td>
+                            <td class="text-muted" style="font-size:0.82rem;"><%= t.getTransactionDate() %></td>
+                            <td><span class="badge badge-success"><%= t.getStatus() %></span></td>
+                        </tr>
+                        <% } } else { %>
+                        <tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-muted);">No transactions recorded in the system yet.</td></tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
