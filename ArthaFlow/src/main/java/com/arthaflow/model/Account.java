@@ -3,7 +3,7 @@ package com.arthaflow.model;
 import java.sql.Timestamp;
 
 /**
- * Model class representing a Bank Account.
+ * Bank account row (balances and lifecycle). KYC payload lives in {@code kyc_details}.
  */
 public class Account {
     private int accountId;
@@ -12,8 +12,7 @@ public class Account {
     private double balance;
     private String accountType;
     private String status;
-    private String idDocumentPath;
-    private String addressProofPath;
+    /** Mirrored from {@code kyc_details} for the same account (not stored on {@code accounts}). */
     private String kycStatus;
     private Timestamp createdDate;
 
@@ -46,12 +45,6 @@ public class Account {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-
-    public String getIdDocumentPath() { return idDocumentPath; }
-    public void setIdDocumentPath(String idDocumentPath) { this.idDocumentPath = idDocumentPath; }
-
-    public String getAddressProofPath() { return addressProofPath; }
-    public void setAddressProofPath(String addressProofPath) { this.addressProofPath = addressProofPath; }
 
     public String getKycStatus() { return kycStatus; }
     public void setKycStatus(String kycStatus) { this.kycStatus = kycStatus; }

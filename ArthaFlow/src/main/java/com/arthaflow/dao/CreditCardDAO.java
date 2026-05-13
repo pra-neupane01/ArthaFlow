@@ -9,21 +9,33 @@ import java.util.List;
 
 public class CreditCardDAO {
 
-    public boolean applyForCard(CreditCard card) {
+    /** Insert pending application; returns generated card_id or -1 */
+    public int insertPendingCard(CreditCard card, Connection conn) throws SQLException {
         String sql = "INSERT INTO credit_cards (user_id, card_type, status) VALUES (?, ?, 'PENDING')";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, card.getUserId());
             ps.setString(2, card.getCardType());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error applying for credit card: " + e.getMessage());
-            return false;
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+            }
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
         }
+        return -1;
     }
 
     public CreditCard getCardByUserId(int userId) {
-        String sql = "SELECT * FROM credit_cards WHERE user_id = ?";
+        String sql = "SELECT * FROM credit_cards WHERE user_id = ? ORDER BY card_id DESC LIMIT 1";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -33,6 +45,21 @@ public class CreditCardDAO {
             }
         } catch (SQLException e) {
             System.out.println("Error fetching credit card: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public CreditCard getCardById(int cardId) {
+        String sql = "SELECT * FROM credit_cards WHERE card_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cardId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToCreditCard(rs);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching credit card by id: " + e.getMessage());
         }
         return null;
     }
@@ -52,6 +79,20 @@ public class CreditCardDAO {
         return cards;
     }
 
+    public boolean cardNumberExists(String cardNumber) {
+        if (cardNumber == null) return false;
+        String sql = "SELECT 1 FROM credit_cards WHERE card_number = ? LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, cardNumber);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println("Error checking card number: " + e.getMessage());
+            return true;
+        }
+    }
+
     public boolean updateCardStatus(int cardId, String status, String cardNumber, String expiryDate, double limit) {
         String sql = "UPDATE credit_cards SET status = ?, card_number = ?, expiry_date = ?, credit_limit = ? WHERE card_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -68,8 +109,64 @@ public class CreditCardDAO {
         }
     }
 
+    public boolean updatePinHash(int cardId, String pinHash) {
+        String sql = "UPDATE credit_cards SET pin_hash = ? WHERE card_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, pinHash);
+            ps.setInt(2, cardId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating PIN: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateCurrentBalance(int cardId, double newBalance, Connection conn) throws SQLException {
+        String sql = "UPDATE credit_cards SET current_balance = ? WHERE card_id = ?";
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, newBalance);
+            ps.setInt(2, cardId);
+            return ps.executeUpdate() > 0;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public boolean rejectCard(int cardId) {
+        try {
+            return rejectCard(cardId, null);
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean rejectCard(int cardId, Connection conn) throws SQLException {
+        String sql = "UPDATE credit_cards SET status = 'REJECTED' WHERE card_id = ?";
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cardId);
+            return ps.executeUpdate() > 0;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
+    }
+
     private CreditCard mapResultSetToCreditCard(ResultSet rs) throws SQLException {
-        return new CreditCard(
+        CreditCard c = new CreditCard(
                 rs.getInt("card_id"),
                 rs.getInt("user_id"),
                 rs.getString("card_number"),
@@ -80,5 +177,12 @@ public class CreditCardDAO {
                 rs.getString("expiry_date"),
                 rs.getTimestamp("created_date")
         );
+        String ph = rs.getString("pin_hash");
+        if (rs.wasNull()) {
+            c.setPinHash(null);
+        } else {
+            c.setPinHash(ph);
+        }
+        return c;
     }
 }

@@ -1,9 +1,11 @@
 package com.arthaflow.service;
 
 import com.arthaflow.dao.AccountDAO;
+import com.arthaflow.dao.KycDetailsDAO;
 import com.arthaflow.dao.TransactionDAO;
 import com.arthaflow.dao.UserDAO;
 import com.arthaflow.model.Account;
+import com.arthaflow.model.KycDetails;
 import com.arthaflow.model.Transaction;
 import com.arthaflow.model.User;
 
@@ -12,24 +14,25 @@ import java.util.List;
 public class AdminService {
     UserDAO userDAO = new UserDAO();
     AccountDAO accountDAO = new AccountDAO();
+    KycDetailsDAO kycDetailsDAO = new KycDetailsDAO();
     TransactionDAO transactionDAO = new TransactionDAO();
 
-    // Get all users
+    public KycDetails getKycForAccountId(int accountId) {
+        return kycDetailsDAO.findByAccountId(accountId);
+    }
+
     public List<User> getAllUsers() {
         return userDAO.getAllUsers();
     }
 
-    // Get all accounts
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
     }
 
-    // Get all transactions
     public List<Transaction> getAllTransactions() {
         return transactionDAO.getAllTransactions();
     }
 
-    // Delete a user and their account
     public boolean deleteUser(int userId) {
         Account account = accountDAO.getAccountByUserId(userId);
         if (account != null) {
@@ -38,22 +41,44 @@ public class AdminService {
         return userDAO.deleteUser(userId);
     }
 
-    // Approve an account (simplified)
     public boolean approveAccount(int accountId) {
         return accountDAO.updateStatus(accountId, "ACTIVE");
     }
 
-    // Issue Account Number and Approve KYC
     public boolean issueAccountNumber(int accountId, String accountNumber) {
-        return accountDAO.issueAccountNumber(accountId, accountNumber);
+        boolean ok = accountDAO.issueAccountNumber(accountId, accountNumber);
+        if (ok) {
+            kycDetailsDAO.updateStatusByAccountId(accountId, "APPROVED");
+        }
+        return ok;
     }
 
-    // Reject an account
+    public boolean issueAccountNumberAuto(int accountId) {
+        java.util.Random r = new java.util.Random();
+        for (int attempt = 0; attempt < 60; attempt++) {
+            String num = "AF" + String.format("%010d", Math.abs(r.nextLong()) % 10_000_000_000L);
+            if (accountDAO.accountNumberExists(num)) {
+                continue;
+            }
+            if (issueAccountNumber(accountId, num)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Transaction> getAllTransactionsBetween(String fromDate, String toDate) {
+        return transactionDAO.getAllTransactionsBetween(fromDate, toDate);
+    }
+
     public boolean rejectAccount(int accountId) {
-        return accountDAO.updateStatus(accountId, "REJECTED");
+        boolean ok = accountDAO.updateStatus(accountId, "REJECTED");
+        if (ok) {
+            kycDetailsDAO.updateStatusByAccountId(accountId, "REJECTED");
+        }
+        return ok;
     }
 
-    // Total deposits across all accounts
     public double getTotalDeposits() {
         List<Transaction> all = transactionDAO.getAllTransactions();
         double total = 0;
@@ -65,7 +90,6 @@ public class AdminService {
         return total;
     }
 
-    // Total withdrawals across all accounts
     public double getTotalWithdrawals() {
         List<Transaction> all = transactionDAO.getAllTransactions();
         double total = 0;

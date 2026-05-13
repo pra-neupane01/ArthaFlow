@@ -128,21 +128,41 @@ public class TransactionDAO {
             ps.setString(3, toDate);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Transaction transaction = new Transaction(
-                        rs.getInt("transaction_id"),
-                        rs.getInt("account_id"),
-                        rs.getString("type"),
-                        rs.getDouble("amount"),
-                        rs.getDouble("balance_after"),
-                        rs.getString("remarks"),
-                        rs.getString("status"),
-                        rs.getTimestamp("transaction_date")
-                );
-                transactions.add(transaction);
+                transactions.add(mapRow(rs));
             }
         } catch (SQLException e) {
             System.out.println("Error searching transactions: " + e.getMessage());
         }
         return transactions;
+    }
+
+    public List<Transaction> getAllTransactionsBetween(String fromDate, String toDate) {
+        String sql = "SELECT * FROM transactions WHERE DATE(transaction_date) BETWEEN ? AND ? ORDER BY transaction_date DESC";
+        List<Transaction> transactions = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fromDate);
+            ps.setString(2, toDate);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                transactions.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error searching all transactions: " + e.getMessage());
+        }
+        return transactions;
+    }
+
+    private Transaction mapRow(ResultSet rs) throws SQLException {
+        return new Transaction(
+                rs.getInt("transaction_id"),
+                rs.getInt("account_id"),
+                rs.getString("type"),
+                rs.getDouble("amount"),
+                rs.getDouble("balance_after"),
+                rs.getString("remarks"),
+                rs.getString("status"),
+                rs.getTimestamp("transaction_date")
+        );
     }
 }

@@ -8,6 +8,10 @@
     List<Transaction> transactions = (List<Transaction>) request.getAttribute("transactions");
     String picUrl = (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty())
         ? request.getContextPath() + "/" + user.getProfilePicture() : null;
+    String rangeAttr = request.getAttribute("range") != null ? (String) request.getAttribute("range") : "all";
+    String fromAttr = request.getAttribute("from") != null ? (String) request.getAttribute("from") : "";
+    String toAttr = request.getAttribute("to") != null ? (String) request.getAttribute("to") : "";
+    String txBase = request.getContextPath() + "/user/transaction";
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,6 +53,23 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <input type="text" id="transactionSearch" placeholder="Search transactions..." style="width:100%;padding:0.4rem 0.6rem 0.4rem 2rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.85rem;">
                     </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:1rem;padding:0.75rem 1rem;">
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Filter by date</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+                    <a href="<%= txBase %>?range=all" class="btn btn-sm <%= "all".equals(rangeAttr) ? "btn-primary" : "btn-outline" %>">All</a>
+                    <a href="<%= txBase %>?range=15" class="btn btn-sm <%= "15".equals(rangeAttr) ? "btn-primary" : "btn-outline" %>">Last 15 days</a>
+                    <a href="<%= txBase %>?range=30" class="btn btn-sm <%= "30".equals(rangeAttr) ? "btn-primary" : "btn-outline" %>">Last 30 days</a>
+                    <form method="get" action="<%= txBase %>" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;margin-left:0.25rem;">
+                        <input type="hidden" name="range" value="custom">
+                        <label style="font-size:0.8rem;">From</label>
+                        <input type="date" name="from" value="<%= fromAttr %>" class="form-control" style="max-width:140px;padding:0.35rem 0.5rem;font-size:0.8rem;">
+                        <label style="font-size:0.8rem;">To</label>
+                        <input type="date" name="to" value="<%= toAttr %>" class="form-control" style="max-width:140px;padding:0.35rem 0.5rem;font-size:0.8rem;">
+                        <button type="submit" class="btn btn-outline btn-sm">Apply range</button>
+                    </form>
                 </div>
             </div>
 
