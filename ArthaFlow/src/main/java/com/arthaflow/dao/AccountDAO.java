@@ -7,32 +7,40 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Account management.
- */
 public class AccountDAO {
 
-    // Create a new bank account request for user - starts as PENDING
-    public boolean createAccount(Account account) {
-        String sql = "INSERT INTO accounts (user_id, balance, account_type, status, id_document_path, address_proof_path, kyc_status) VALUES (?, ?, ?, 'PENDING', ?, ?, 'PENDING')";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    /**
+     * @return generated account_id, or -1 on failure
+     */
+    public int insertPendingAccount(Account account, Connection conn) throws SQLException {
+        String sql = "INSERT INTO accounts (user_id, balance, account_type, status) VALUES (?, ?, ?, 'PENDING')";
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, account.getUserId());
             ps.setDouble(2, account.getBalance());
             ps.setString(3, account.getAccountType());
-            ps.setString(4, account.getIdDocumentPath());
-            ps.setString(5, account.getAddressProofPath());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error while creating Account: " + e.getMessage());
-            return false;
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+            }
+            return -1;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
         }
     }
 
-    // Get account by user ID
     public Account getAccountByUserId(int userId) {
         String sql = "SELECT * FROM accounts WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -48,7 +56,6 @@ public class AccountDAO {
         return null;
     }
 
-    // Get account by account ID
     public Account getAccountById(int accountId) {
         String sql = "SELECT * FROM accounts WHERE account_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -65,7 +72,7 @@ public class AccountDAO {
     }
 
     private Account mapResultSetToAccount(ResultSet rs) throws SQLException {
-        Account account = new Account(
+        return new Account(
                 rs.getInt("account_id"),
                 rs.getString("account_number"),
                 rs.getInt("user_id"),
@@ -74,13 +81,8 @@ public class AccountDAO {
                 rs.getString("status"),
                 rs.getTimestamp("created_date")
         );
-        account.setIdDocumentPath(rs.getString("id_document_path"));
-        account.setAddressProofPath(rs.getString("address_proof_path"));
-        account.setKycStatus(rs.getString("kyc_status"));
-        return account;
     }
 
-    // Update account balance - supports transactions
     public boolean updateBalance(int accountId, double newBalance, Connection conn) throws SQLException {
         String sql = "UPDATE accounts SET balance = ? WHERE account_id = ?";
         boolean closeConn = false;
@@ -88,7 +90,6 @@ public class AccountDAO {
             conn = DatabaseConnection.getConnection();
             closeConn = true;
         }
-        
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, newBalance);
             ps.setInt(2, accountId);
@@ -100,9 +101,8 @@ public class AccountDAO {
         }
     }
 
-    // Admin Issues Account Number and activates account
     public boolean issueAccountNumber(int accountId, String accountNumber) {
-        String sql = "UPDATE accounts SET account_number = ?, status = 'ACTIVE', kyc_status = 'APPROVED' WHERE account_id = ?";
+        String sql = "UPDATE accounts SET account_number = ?, status = 'ACTIVE' WHERE account_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, accountNumber);
@@ -114,7 +114,20 @@ public class AccountDAO {
         }
     }
 
-    // Update account status (ACTIVE, PENDING, REJECTED)
+    public boolean accountNumberExists(String accountNumber) {
+        if (accountNumber == null) return false;
+        String sql = "SELECT 1 FROM accounts WHERE account_number = ? LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, accountNumber);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println("Error checking account number: " + e.getMessage());
+            return true;
+        }
+    }
+
     public boolean updateStatus(int accountId, String status) {
         String sql = "UPDATE accounts SET status = ? WHERE account_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -128,7 +141,6 @@ public class AccountDAO {
         }
     }
 
-    // Get all accounts (for admin)
     public List<Account> getAllAccounts() {
         String sql = "SELECT * FROM accounts ORDER BY created_date DESC";
         List<Account> accounts = new ArrayList<>();
@@ -144,7 +156,6 @@ public class AccountDAO {
         return accounts;
     }
 
-    // Delete account by account ID
     public boolean deleteAccount(int accountId) {
         String sql = "DELETE FROM accounts WHERE account_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();

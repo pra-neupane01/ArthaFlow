@@ -4,6 +4,7 @@ import com.arthaflow.dao.AccountDAO;
 import com.arthaflow.dao.TransactionDAO;
 import com.arthaflow.model.Account;
 import com.arthaflow.model.Transaction;
+import com.arthaflow.service.AccountService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +14,14 @@ import java.util.List;
  */
 public class TransactionService {
     AccountDAO accountDAO = new AccountDAO();
+    AccountService accountService = new AccountService();
     TransactionDAO transactionDAO = new TransactionDAO();
 
     // Deposit money into account - Uses Database Transactions for ACID
     public boolean deposit(int userId, double amount, String description) {
         if (amount <= 0) return false;
 
-        Account account = accountDAO.getAccountByUserId(userId);
+        Account account = accountService.getAccountDetails(userId);
         if (account == null || !"ACTIVE".equals(account.getStatus())) {
             return false;
         }
@@ -59,7 +61,7 @@ public class TransactionService {
     public String withdraw(int userId, double amount, String description) {
         if (amount <= 0) return "Amount must be greater than zero";
 
-        Account account = accountDAO.getAccountByUserId(userId);
+        Account account = accountService.getAccountDetails(userId);
         if (account == null) return "Account not found";
         if (!"ACTIVE".equals(account.getStatus())) return "Account is not active";
         if (!"APPROVED".equals(account.getKycStatus())) return "KYC verification pending. Please complete KYC to transact.";
@@ -89,6 +91,14 @@ public class TransactionService {
             System.out.println("Database error during withdrawal: " + e.getMessage());
         }
         return "Withdrawal failed. Please try again.";
+    }
+
+    public List<Transaction> getTransactionHistoryFiltered(int userId, String fromDate, String toDate) {
+        Account account = accountDAO.getAccountByUserId(userId);
+        if (account == null) {
+            return new ArrayList<>();
+        }
+        return transactionDAO.searchByDate(account.getAccountId(), fromDate, toDate);
     }
 
     // Get full transaction history for a user

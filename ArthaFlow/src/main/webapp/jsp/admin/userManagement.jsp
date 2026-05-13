@@ -1,5 +1,6 @@
 <%@ page import="com.arthaflow.model.User" %>
 <%@ page import="com.arthaflow.model.Account" %>
+<%@ page import="com.arthaflow.model.KycDetails" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
@@ -11,6 +12,9 @@
     List<Account> accs  = (List<Account>) request.getAttribute("accounts");
     Map<Integer, Account> accMap = new HashMap<>();
     if (accs != null) for (Account a : accs) accMap.put(a.getUserId(), a);
+    @SuppressWarnings("unchecked")
+    Map<Integer, KycDetails> accountKycByAccountId = (Map<Integer, KycDetails>) request.getAttribute("accountKycByAccountId");
+    if (accountKycByAccountId == null) accountKycByAccountId = new HashMap<>();
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,6 +56,7 @@
                                 for (User u : users) {
                                     if ("ADMIN".equals(u.getRole())) continue;
                                     Account acc = accMap.get(u.getUserId());
+                                    KycDetails ak = (acc != null) ? accountKycByAccountId.get(acc.getAccountId()) : null;
                         %>
                         <tr>
                             <td>
@@ -64,9 +69,11 @@
                                 <div class="text-muted" style="font-size:0.78rem;margin-top:2px;"><%= u.getAddress() %></div>
                             </td>
                             <td>
-                                <% if (acc != null && acc.getIdDocumentPath() != null && !acc.getIdDocumentPath().isEmpty()) { %>
-                                    <a href="<%= request.getContextPath() %>/<%= acc.getIdDocumentPath() %>" target="_blank" class="btn btn-outline btn-sm" style="margin-bottom:4px;display:block;max-width:140px;">📄 View ID</a>
-                                    <a href="<%= request.getContextPath() %>/<%= acc.getAddressProofPath() %>" target="_blank" class="btn btn-ghost btn-sm" style="display:block;max-width:140px;">📍 View Address</a>
+                                <% if (ak != null && ak.getIdDocumentPath() != null && !ak.getIdDocumentPath().isEmpty()) { %>
+                                    <a href="<%= request.getContextPath() %>/<%= ak.getIdDocumentPath() %>" target="_blank" class="btn btn-outline btn-sm" style="margin-bottom:4px;display:block;max-width:140px;">📄 View ID</a>
+                                    <% if (ak.getAddressProofPath() != null && !ak.getAddressProofPath().isEmpty()) { %>
+                                    <a href="<%= request.getContextPath() %>/<%= ak.getAddressProofPath() %>" target="_blank" class="btn btn-ghost btn-sm" style="display:block;max-width:140px;">📍 View Address</a>
+                                    <% } %>
                                 <% } else { %>
                                     <span class="text-muted" style="font-size:0.82rem;">No docs uploaded</span>
                                 <% } %>
@@ -78,6 +85,13 @@
                                     </span>
                                     <div style="font-size:0.82rem;margin-top:0.4rem;"><span class="text-muted">Type:</span> <%= acc.getAccountType() %></div>
                                     <div style="font-size:0.82rem;"><span class="text-muted">Num:</span> <%= acc.getAccount_number() != null ? acc.getAccount_number() : "Not Issued" %></div>
+                                    <% if (ak != null && ak.getCitizenshipNumber() != null && !ak.getCitizenshipNumber().isEmpty()) { %>
+                                    <div style="font-size:0.78rem;margin-top:0.35rem;color:var(--text-muted);">Citizenship: <span class="fw-bold" style="color:var(--text);"><%= ak.getCitizenshipNumber() %></span></div>
+                                    <% } %>
+                                    <% if (ak != null && ak.getDateOfBirth() != null) { %>
+                                    <div style="font-size:0.78rem;color:var(--text-muted);">DOB: <span class="fw-bold" style="color:var(--text);"><%= ak.getDateOfBirth() %></span>
+                                    <% if (ak.getGender() != null && !ak.getGender().isEmpty()) { %> · <%= ak.getGender() %><% } %></div>
+                                    <% } %>
                                 <% } else { %>
                                     <span class="text-muted" style="font-size:0.82rem;">No application</span>
                                 <% } %>
@@ -88,11 +102,7 @@
                                 <form action="<%= request.getContextPath() %>/admin/dashboard" method="POST" style="margin-bottom:6px;">
                                     <input type="hidden" name="action" value="issueAccountNumber">
                                     <input type="hidden" name="accountId" value="<%= acc.getAccountId() %>">
-                                    <div style="display:flex;gap:5px;margin-bottom:5px;">
-                                        <input type="text" name="accountNumber" placeholder="Account Number" required
-                                               style="flex:1;padding:0.4rem 0.6rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.8rem;">
-                                        <button type="submit" class="btn btn-primary btn-sm">✓ Issue</button>
-                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">✓ Issue account number</button>
                                 </form>
                                 <form action="<%= request.getContextPath() %>/admin/dashboard" method="POST" style="display:inline;">
                                     <input type="hidden" name="action" value="rejectAccount">

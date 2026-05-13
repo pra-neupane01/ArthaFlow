@@ -11,6 +11,7 @@ public class CreditCard {
     private double currentBalance;
     private String status; // PENDING, ACTIVE, REJECTED
     private String expiryDate;
+    private String pinHash;
     private Timestamp createdDate;
 
     public CreditCard() {}
@@ -46,4 +47,11 @@ public class CreditCard {
     public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
     public Timestamp getCreatedDate() { return createdDate; }
     public void setCreatedDate(Timestamp createdDate) { this.createdDate = createdDate; }
+
+    public String getPinHash() { return pinHash; }
+    public void setPinHash(String pinHash) { this.pinHash = pinHash; }
+
+    public boolean isPinSet() {
+        return pinHash != null && !pinHash.isEmpty();
+    }
 }

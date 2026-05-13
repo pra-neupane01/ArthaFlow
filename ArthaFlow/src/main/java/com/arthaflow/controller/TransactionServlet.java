@@ -4,6 +4,7 @@ import com.arthaflow.model.Account;
 import com.arthaflow.model.User;
 import com.arthaflow.service.AccountService;
 import com.arthaflow.service.TransactionService;
+import com.arthaflow.util.DateRangeHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,8 +32,18 @@ public class TransactionServlet extends HttpServlet {
             req.getRequestDispatcher("/jsp/user/withdraw.jsp").forward(req, resp);
 
         } else {
-            // history (default)
-            req.setAttribute("transactions", transactionService.getTransactionHistory(user.getUserId()));
+            String range = req.getParameter("range");
+            String from = req.getParameter("from");
+            String to = req.getParameter("to");
+            String[] bounds = DateRangeHelper.resolve(range, from, to);
+            if (bounds == null) {
+                req.setAttribute("transactions", transactionService.getTransactionHistory(user.getUserId()));
+            } else {
+                req.setAttribute("transactions", transactionService.getTransactionHistoryFiltered(user.getUserId(), bounds[0], bounds[1]));
+            }
+            req.setAttribute("range", range != null ? range : "all");
+            req.setAttribute("from", from != null ? from : "");
+            req.setAttribute("to", to != null ? to : "");
             req.getRequestDispatcher("/jsp/user/transactionHistory.jsp").forward(req, resp);
         }
     }

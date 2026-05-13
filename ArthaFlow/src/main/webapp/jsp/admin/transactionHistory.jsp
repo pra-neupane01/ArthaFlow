@@ -6,6 +6,10 @@
     User admin = (User) session.getAttribute("user");
     if (admin == null || !"ADMIN".equals(admin.getRole())) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<Transaction> transactions = (List<Transaction>) request.getAttribute("transactions");
+    String rangeAttr = request.getAttribute("range") != null ? (String) request.getAttribute("range") : "all";
+    String fromAttr = request.getAttribute("from") != null ? (String) request.getAttribute("from") : "";
+    String toAttr = request.getAttribute("to") != null ? (String) request.getAttribute("to") : "";
+    String admTx = request.getContextPath() + "/admin/dashboard?action=transactions";
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +31,25 @@
         </div>
         <div class="page-content">
             <div class="page-header"><h1>Global Transaction Logs</h1><p>All deposits and withdrawals across the ArthaFlow network in NPR.</p></div>
+
+            <div class="card" style="margin-bottom:1rem;padding:0.75rem 1rem;">
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Filter by date</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+                    <a href="<%= admTx %>&range=all" class="btn btn-sm <%= "all".equals(rangeAttr) ? "btn-primary" : "btn-outline" %>">All</a>
+                    <a href="<%= admTx %>&range=15" class="btn btn-sm <%= "15".equals(rangeAttr) ? "btn-primary" : "btn-outline" %>">Last 15 days</a>
+                    <a href="<%= admTx %>&range=30" class="btn btn-sm <%= "30".equals(rangeAttr) ? "btn-primary" : "btn-outline" %>">Last 30 days</a>
+                    <form method="get" action="<%= request.getContextPath() %>/admin/dashboard" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;margin-left:0.25rem;">
+                        <input type="hidden" name="action" value="transactions">
+                        <input type="hidden" name="range" value="custom">
+                        <label style="font-size:0.8rem;">From</label>
+                        <input type="date" name="from" value="<%= fromAttr %>" class="form-control" style="max-width:140px;padding:0.35rem 0.5rem;font-size:0.8rem;">
+                        <label style="font-size:0.8rem;">To</label>
+                        <input type="date" name="to" value="<%= toAttr %>" class="form-control" style="max-width:140px;padding:0.35rem 0.5rem;font-size:0.8rem;">
+                        <button type="submit" class="btn btn-outline btn-sm">Apply range</button>
+                    </form>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="table-wrapper">
                     <table class="data-table">
