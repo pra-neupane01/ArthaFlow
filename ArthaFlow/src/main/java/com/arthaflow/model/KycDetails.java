@@ -33,6 +33,7 @@ public class KycDetails {
     private String cardPreferences;
     private String creditInformation;
     private boolean termsAccepted;
+    private String rejectionRemarks;
     private Timestamp createdDate;
 
     public KycDetails() {}
@@ -90,6 +91,8 @@ public class KycDetails {
     public void setCreditInformation(String creditInformation) { this.creditInformation = creditInformation; }
     public boolean isTermsAccepted() { return termsAccepted; }
     public void setTermsAccepted(boolean termsAccepted) { this.termsAccepted = termsAccepted; }
+    public String getRejectionRemarks() { return rejectionRemarks; }
+    public void setRejectionRemarks(String rejectionRemarks) { this.rejectionRemarks = rejectionRemarks; }
     public Timestamp getCreatedDate() { return createdDate; }
     public void setCreatedDate(Timestamp createdDate) { this.createdDate = createdDate; }
 }

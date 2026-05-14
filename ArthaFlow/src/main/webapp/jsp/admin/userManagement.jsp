@@ -5,13 +5,24 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%!
+    private String h(Object value) {
+        if (value == null) return "";
+        return value.toString()
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+    }
+%>
 <%
     User admin = (User) session.getAttribute("user");
     if (admin == null || !"ADMIN".equals(admin.getRole())) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     List<User> users    = (List<User>) request.getAttribute("users");
     List<Account> accs  = (List<Account>) request.getAttribute("accounts");
     Map<Integer, Account> accMap = new HashMap<>();
-    if (accs != null) for (Account a : accs) accMap.put(a.getUserId(), a);
+    if (accs != null) for (Account a : accs) accMap.putIfAbsent(a.getUserId(), a);
     @SuppressWarnings("unchecked")
     Map<Integer, KycDetails> accountKycByAccountId = (Map<Integer, KycDetails>) request.getAttribute("accountKycByAccountId");
     if (accountKycByAccountId == null) accountKycByAccountId = new HashMap<>();
@@ -92,6 +103,11 @@
                                     <div style="font-size:0.78rem;color:var(--text-muted);">DOB: <span class="fw-bold" style="color:var(--text);"><%= ak.getDateOfBirth() %></span>
                                     <% if (ak.getGender() != null && !ak.getGender().isEmpty()) { %> · <%= ak.getGender() %><% } %></div>
                                     <% } %>
+                                    <% if (ak != null && ak.getRejectionRemarks() != null && !ak.getRejectionRemarks().isBlank()) { %>
+                                    <div style="font-size:0.78rem;margin-top:0.45rem;color:var(--danger);">
+                                        <span class="fw-bold">Remark:</span> <%= h(ak.getRejectionRemarks()) %>
+                                    </div>
+                                    <% } %>
                                 <% } else { %>
                                     <span class="text-muted" style="font-size:0.82rem;">No application</span>
                                 <% } %>
@@ -104,9 +120,12 @@
                                     <input type="hidden" name="accountId" value="<%= acc.getAccountId() %>">
                                     <button type="submit" class="btn btn-primary btn-sm">✓ Issue account number</button>
                                 </form>
-                                <form action="<%= request.getContextPath() %>/admin/dashboard" method="POST" style="display:inline;">
+                                <form action="<%= request.getContextPath() %>/admin/dashboard" method="POST" style="margin-top:6px;">
                                     <input type="hidden" name="action" value="rejectAccount">
                                     <input type="hidden" name="accountId" value="<%= acc.getAccountId() %>">
+                                    <textarea name="rejectionRemarks" class="form-control" rows="2" required maxlength="1000"
+                                              placeholder="Reason this account is not eligible"
+                                              style="font-size:0.78rem;margin-bottom:6px;min-width:200px;"></textarea>
                                     <button type="submit" class="btn btn-danger btn-sm">✗ Reject</button>
                                 </form>
                                 <% } %>

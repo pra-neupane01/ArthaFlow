@@ -42,7 +42,7 @@ public class AccountDAO {
     }
 
     public Account getAccountByUserId(int userId) {
-        String sql = "SELECT * FROM accounts WHERE user_id = ?";
+        String sql = "SELECT * FROM accounts WHERE user_id = ? ORDER BY created_date DESC, account_id DESC LIMIT 1";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);

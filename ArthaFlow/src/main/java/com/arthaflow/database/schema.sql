@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS kyc_details (
     card_preferences     TEXT,
     credit_information   TEXT,
     terms_accepted       TINYINT(1) DEFAULT 0,
+    rejection_remarks    TEXT,
     created_date         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
