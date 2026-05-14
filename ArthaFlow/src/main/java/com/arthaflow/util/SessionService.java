@@ -5,8 +5,8 @@ import jakarta.servlet.http.HttpSession;
 
 public class SessionService {
 
-    /** Signed-in users: longer inactivity window (minutes). */
-    public static final int AUTHENTICATED_MAX_INACTIVE_SECONDS = 30 * 60;
+    /** Signed-in users: inactivity before session expires (2 minutes). */
+    public static final int AUTHENTICATED_MAX_INACTIVE_SECONDS = 2 * 60;
 
     public static void setUserSession(HttpServletRequest req, Object user) {
         HttpSession session = req.getSession();

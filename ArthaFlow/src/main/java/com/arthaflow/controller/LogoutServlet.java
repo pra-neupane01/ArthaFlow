@@ -1,5 +1,6 @@
 package com.arthaflow.controller;
 
+import com.arthaflow.util.CookieUtil;
 import com.arthaflow.util.SessionService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +16,7 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         SessionService.endSession(req);
+        CookieUtil.clearAuthMarker(resp, req.getContextPath());
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 

@@ -28,6 +28,7 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             SessionService.setUserSession(req, user);
             CookieUtil.setUserCookie(resp, email);
+            CookieUtil.setAuthMarker(resp, req.getContextPath());
 
             if ("ADMIN".equals(user.getRole())) {
                 resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
