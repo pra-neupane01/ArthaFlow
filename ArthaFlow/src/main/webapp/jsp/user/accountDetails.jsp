@@ -2,11 +2,23 @@
 <%@ page import="com.arthaflow.model.Account" %>
 <%@ page import="com.arthaflow.model.KycDetails" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%!
+    private String h(Object value) {
+        if (value == null) return "";
+        return value.toString()
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+    }
+%>
 <%
     User user = (User) session.getAttribute("user");
     if (user == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
     Account account = (Account) request.getAttribute("account");
     KycDetails accountKyc = (KycDetails) request.getAttribute("accountKyc");
+    boolean canApply = account == null || "REJECTED".equals(account.getStatus()) || "CLOSED".equals(account.getStatus());
     String picUrl = (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty())
         ? request.getContextPath() + "/" + user.getProfilePicture() : null;
 %>
@@ -48,10 +60,18 @@
                 <div class="alert alert-success">✓ <%= request.getParameter("success") %></div>
             <% } %>
 
-            <% if (account == null) { %>
+            <% if (canApply) { %>
             <!-- NO ACCOUNT — KYC FORM -->
+            <% if (account != null && "REJECTED".equals(account.getStatus())) { %>
+            <div class="alert alert-danger" style="max-width:720px;">
+                Your previous account opening application was rejected.
+                <% if (accountKyc != null && accountKyc.getRejectionRemarks() != null && !accountKyc.getRejectionRemarks().isBlank()) { %>
+                    <div style="margin-top:0.4rem;"><strong>Admin remark:</strong> <%= h(accountKyc.getRejectionRemarks()) %></div>
+                <% } %>
+            </div>
+            <% } %>
             <div class="card" style="max-width: 720px;">
-                <div class="card-header"><h3>Account opening &amp; KYC</h3></div>
+                <div class="card-header"><h3><%= account == null ? "Account opening &amp; KYC" : "Reapply for account opening" %></h3></div>
                 <p class="text-muted mb-3">Submit your details and upload identity documents. Our admin team will verify and issue your account number within 1–2 business days.</p>
                 <form action="<%= request.getContextPath() %>/user/account" method="POST" enctype="multipart/form-data">
                     <h4 style="font-size:0.95rem;margin:0.5rem 0;color:var(--text);">Account</h4>
@@ -117,7 +137,7 @@
                     <div class="form-group">
                         <label class="form-label">Identity document (citizenship / passport)</label>
                         <input type="file" name="idDocument" accept="image/*,.pdf" required class="form-control">
-                        <span class="text-muted" style="font-size:0.8rem;">Accepted: JPG, PNG, PDF (max 10MB)</span>
+                        <span class="text-muted" style="font-size:0.8rem;">Accepted: JPG, PNG, PDF (max 2MB)</span>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Proof of address (utility bill / letter)</label>

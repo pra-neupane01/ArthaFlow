@@ -23,6 +23,8 @@ import java.util.UUID;
         maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 public class AccountServlet extends HttpServlet {
+    private static final long IDENTITY_DOCUMENT_MAX_SIZE_BYTES = 1024 * 1024 * 2; // 2MB
+
     AccountService accountService = new AccountService();
 
     @Override
@@ -66,6 +68,11 @@ public class AccountServlet extends HttpServlet {
             Part addrPart = req.getPart("addressProof");
 
             if (idPart != null && idPart.getSize() > 0) {
+                if (idPart.getSize() > IDENTITY_DOCUMENT_MAX_SIZE_BYTES) {
+                    req.setAttribute("error", "Identity document must be 2MB or smaller.");
+                    doGet(req, resp);
+                    return;
+                }
                 String fileName = UUID.randomUUID().toString() + "_"
                         + Paths.get(idPart.getSubmittedFileName()).getFileName().toString();
                 idPart.write(uploadPath + File.separator + fileName);
@@ -113,8 +120,8 @@ public class AccountServlet extends HttpServlet {
         }
 
         Account existing = accountService.getAccountDetails(user.getUserId());
-        if (existing != null) {
-            req.setAttribute("error", "You have already applied for an account.");
+        if (existing != null && !"REJECTED".equals(existing.getStatus()) && !"CLOSED".equals(existing.getStatus())) {
+            req.setAttribute("error", "You already have an account application in progress or an active account.");
             doGet(req, resp);
             return;
         }

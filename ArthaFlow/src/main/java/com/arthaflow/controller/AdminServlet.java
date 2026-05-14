@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +117,13 @@ public class AdminServlet extends HttpServlet {
             }
         } else if ("rejectAccount".equals(action)) {
             int accountId = Integer.parseInt(req.getParameter("accountId"));
-            if (adminService.rejectAccount(accountId)) {
+            String rejectionRemarks = req.getParameter("rejectionRemarks");
+            if (rejectionRemarks == null || rejectionRemarks.isBlank()) {
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error="
+                        + URLEncoder.encode("Please provide rejection remarks before rejecting an account.", StandardCharsets.UTF_8));
+                return;
+            }
+            if (adminService.rejectAccount(accountId, rejectionRemarks)) {
                 resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&success=Account+rejected+successfully.");
             } else {
                 resp.sendRedirect(req.getContextPath() + "/admin/dashboard?action=users&error=Failed+to+reject+account.");

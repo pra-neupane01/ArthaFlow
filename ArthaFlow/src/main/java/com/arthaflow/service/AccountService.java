@@ -32,8 +32,9 @@ public class AccountService {
      * @return null on success, or an error message
      */
     public String createAccountWithKyc(Account accountShell, KycDetails kyc) {
-        if (accountDAO.getAccountByUserId(accountShell.getUserId()) != null) {
-            return "You have already applied for an account.";
+        Account existing = accountDAO.getAccountByUserId(accountShell.getUserId());
+        if (existing != null && !"REJECTED".equals(existing.getStatus()) && !"CLOSED".equals(existing.getStatus())) {
+            return "You already have an account application in progress or an active account.";
         }
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);

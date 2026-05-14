@@ -12,8 +12,8 @@ public class KycDetailsDAO {
                 + "citizenship_number, date_of_birth, occupation, father_name, mother_name, family_details, gender, "
                 + "permanent_address, mailing_address, id_document_path, address_proof_path, "
                 + "annual_income, minimum_income, personal_information, income_details, "
-                + "employment_details, card_preferences, credit_information, terms_accepted) "
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "employment_details, card_preferences, credit_information, terms_accepted, rejection_remarks) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         boolean closeConn = false;
         if (conn == null) {
             conn = DatabaseConnection.getConnection();
@@ -46,6 +46,7 @@ public class KycDetailsDAO {
             ps.setString(i++, emptyToNull(k.getCardPreferences()));
             ps.setString(i++, emptyToNull(k.getCreditInformation()));
             ps.setInt(i++, k.isTermsAccepted() ? 1 : 0);
+            ps.setString(i++, emptyToNull(k.getRejectionRemarks()));
             return ps.executeUpdate() > 0;
         } finally {
             if (closeConn && conn != null) {
@@ -133,6 +134,20 @@ public class KycDetailsDAO {
         }
     }
 
+    public boolean updateStatusAndRemarksByAccountId(int accountId, String status, String rejectionRemarks) {
+        String sql = "UPDATE kyc_details SET status = ?, rejection_remarks = ? WHERE account_id = ? AND purpose = 'ACCOUNT_OPENING'";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, emptyToNull(rejectionRemarks));
+            ps.setInt(3, accountId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("updateStatusAndRemarksByAccountId: " + e.getMessage());
+            return false;
+        }
+    }
+
     private KycDetails map(ResultSet rs) throws SQLException {
         KycDetails k = new KycDetails();
         k.setKycId(rs.getInt("kyc_id"));
@@ -165,6 +180,7 @@ public class KycDetailsDAO {
         k.setCardPreferences(rs.getString("card_preferences"));
         k.setCreditInformation(rs.getString("credit_information"));
         k.setTermsAccepted(rs.getInt("terms_accepted") == 1);
+        k.setRejectionRemarks(rs.getString("rejection_remarks"));
         k.setCreatedDate(rs.getTimestamp("created_date"));
         return k;
     }

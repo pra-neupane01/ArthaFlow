@@ -71,10 +71,10 @@ public class AdminService {
         return transactionDAO.getAllTransactionsBetween(fromDate, toDate);
     }
 
-    public boolean rejectAccount(int accountId) {
+    public boolean rejectAccount(int accountId, String rejectionRemarks) {
         boolean ok = accountDAO.updateStatus(accountId, "REJECTED");
         if (ok) {
-            kycDetailsDAO.updateStatusByAccountId(accountId, "REJECTED");
+            kycDetailsDAO.updateStatusAndRemarksByAccountId(accountId, "REJECTED", rejectionRemarks);
         }
         return ok;
     }
