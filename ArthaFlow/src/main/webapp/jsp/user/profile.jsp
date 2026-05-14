@@ -87,10 +87,26 @@
                     </form>
 
                     <hr class="divider">
-                    <div>
-                        <span class="stat-label">Account Security</span>
-                        <p class="text-muted" style="font-size:0.85rem;margin-top:0.4rem;">To change your password, please contact the ArthaFlow admin at <strong>Sundar Haraicha 04, Dulari, Itahari</strong>.</p>
-                    </div>
+                    <div class="card-header" style="padding-top:0;"><h3>Change password</h3></div>
+                    <p class="text-muted" style="font-size:0.85rem;margin-bottom:1rem;">Use 8+ characters with uppercase, lowercase, a number, and a special character (@$!%*?&amp;).</p>
+                    <form action="<%= request.getContextPath() %>/user/profile" method="POST">
+                        <input type="hidden" name="action" value="changePassword">
+                        <div class="form-group">
+                            <label class="form-label" for="currentPassword">Current password</label>
+                            <input type="password" id="currentPassword" name="currentPassword" class="form-control" required autocomplete="current-password">
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label" for="newPassword">New password</label>
+                                <input type="password" id="newPassword" name="newPassword" class="form-control" required minlength="8" autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="confirmPassword">Confirm new password</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required minlength="8" autocomplete="new-password">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline">Update password</button>
+                    </form>
                 </div>
             </div>
         </div>

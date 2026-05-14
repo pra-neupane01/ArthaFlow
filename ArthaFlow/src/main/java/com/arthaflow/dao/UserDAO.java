@@ -82,6 +82,19 @@ public class UserDAO {
         }
     }
 
+    public boolean updatePassword(int userId, String hashedPassword) {
+        String sql = "UPDATE users SET password=? WHERE user_id=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, hashedPassword);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating password: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean updateProfilePicture(int userId, String picturePath) {
         String sql = "UPDATE users SET profile_picture=? WHERE user_id=?";
         try (Connection conn = DatabaseConnection.getConnection();
