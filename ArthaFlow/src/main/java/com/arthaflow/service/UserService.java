@@ -64,4 +64,34 @@ public class UserService {
 
         return userdao.updateUser(user);
     }
+
+    /**
+     * @return null on success, otherwise a short error message for the user.
+     */
+    public String changePassword(int userId, String currentPassword, String newPassword, String confirmPassword) {
+        if (currentPassword == null || currentPassword.isEmpty()) {
+            return "Current password is required.";
+        }
+        if (newPassword == null || newPassword.isEmpty()) {
+            return "New password is required.";
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            return "New password and confirmation do not match.";
+        }
+        if (!ValidationService.isValidPassword(newPassword)) {
+            return "New password must be 8+ characters with uppercase, lowercase, number, and special character (@$!%*?&).";
+        }
+        User user = userdao.getUserById(userId);
+        if (user == null) {
+            return "Account not found.";
+        }
+        if (!PasswordEncryption.verifyPassword(currentPassword, user.getPassword())) {
+            return "Current password is incorrect.";
+        }
+        if (PasswordEncryption.verifyPassword(newPassword, user.getPassword())) {
+            return "Choose a password different from your current one.";
+        }
+        String hashed = PasswordEncryption.hashPassword(newPassword);
+        return userdao.updatePassword(userId, hashed) ? null : "Could not update password. Please try again.";
+    }
 }

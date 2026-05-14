@@ -2,6 +2,7 @@ package com.arthaflow.controller;
 
 import com.arthaflow.dao.UserDAO;
 import com.arthaflow.model.User;
+import com.arthaflow.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +13,8 @@ import jakarta.servlet.http.Part;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024,
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class ProfileServlet extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -83,6 +87,19 @@ public class ProfileServlet extends HttpServlet {
                 }
             } else {
                 resp.sendRedirect(req.getContextPath() + "/user/profile?error=No+file+selected.");
+            }
+        } else if ("changePassword".equals(action)) {
+            String current = req.getParameter("currentPassword");
+            String newPass = req.getParameter("newPassword");
+            String confirm = req.getParameter("confirmPassword");
+            String err = userService.changePassword(user.getUserId(), current, newPass, confirm);
+            String ctx = req.getContextPath();
+            if (err == null) {
+                session.setAttribute("user", userDAO.getUserById(user.getUserId()));
+                resp.sendRedirect(ctx + "/user/profile?success="
+                        + URLEncoder.encode("Password changed successfully.", StandardCharsets.UTF_8));
+            } else {
+                resp.sendRedirect(ctx + "/user/profile?error=" + URLEncoder.encode(err, StandardCharsets.UTF_8));
             }
         } else {
             resp.sendRedirect(req.getContextPath() + "/user/profile");
