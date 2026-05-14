@@ -39,6 +39,9 @@
         <% if (request.getAttribute("success") != null) { %>
             <div class="alert alert-success">✓ <%= request.getAttribute("success") %></div>
         <% } %>
+        <% if ("1".equals(request.getParameter("timeout"))) { %>
+            <div class="alert alert-danger">Session timed out due to inactivity. Please sign in again.</div>
+        <% } %>
 
         <form action="<%= request.getContextPath() %>/login" method="POST">
             <div class="form-group">

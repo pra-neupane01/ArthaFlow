@@ -97,15 +97,6 @@
     </servlet-mapping>
 
     <filter>
-        <filter-name>GuestSessionFilter</filter-name>
-        <filter-class>com.arthaflow.filter.GuestSessionFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>GuestSessionFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
-    <filter>
         <filter-name>AuthenticationFilter</filter-name>
         <filter-class>com.arthaflow.filter.AuthenticationFilter</filter-class>
     </filter>

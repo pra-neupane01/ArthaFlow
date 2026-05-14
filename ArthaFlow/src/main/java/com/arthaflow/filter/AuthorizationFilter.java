@@ -1,6 +1,7 @@
 package com.arthaflow.filter;
 
 import com.arthaflow.model.User;
+import com.arthaflow.util.CookieUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,8 +25,13 @@ public class AuthorizationFilter implements Filter {
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
-        if(user == null){
-            resp.sendRedirect(contextPath + "/login");
+        if (user == null) {
+            if (CookieUtil.hasAuthMarker(req)) {
+                CookieUtil.clearAuthMarker(resp, contextPath);
+                resp.sendRedirect(contextPath + "/login?timeout=1");
+            } else {
+                resp.sendRedirect(contextPath + "/login");
+            }
             return;
         }
 
