@@ -163,6 +163,11 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
                     Deposit
                 </a>
+                <a href="<%= request.getContextPath() %>/user/transaction?action=transfer"
+                   style="display:flex;align-items:center;gap:0.4rem;padding:0.55rem 1.1rem;background:var(--primary-bg);color:var(--primary);border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem;font-weight:600;text-decoration:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    Transfer
+                </a>
                 <a href="<%= request.getContextPath() %>/user/transaction?action=withdraw"
                    style="display:flex;align-items:center;gap:0.4rem;padding:0.55rem 1.1rem;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:0.85rem;font-weight:600;text-decoration:none;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
@@ -262,7 +267,7 @@
                 </div>
                 <div>
                     <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;">Quick Actions</h3>
-                    <div class="quick-action-grid" style="margin-bottom: 0; grid-template-columns: repeat(2, 1fr);">
+                    <div class="quick-action-grid" style="margin-bottom: 0; grid-template-columns: repeat(3, 1fr);">
                         <a href="<%= request.getContextPath() %>/user/transaction?action=deposit" class="qa-card">
                             <div class="qa-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
@@ -274,6 +279,12 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
                             </div>
                             <span class="qa-label">Withdraw</span>
+                        </a>
+                        <a href="<%= request.getContextPath() %>/user/transaction?action=transfer" class="qa-card">
+                            <div class="qa-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                            </div>
+                            <span class="qa-label">Transfer</span>
                         </a>
                         <a href="<%= request.getContextPath() %>/user/account" class="qa-card">
                             <div class="qa-icon">

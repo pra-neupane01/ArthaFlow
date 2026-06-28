@@ -4,6 +4,7 @@
     User _u = (User) session.getAttribute("user");
     String _uri = request.getRequestURI();
     String _ctx = request.getContextPath();
+    String _txAction = request.getParameter("action");
     String _pp = (_u != null && _u.getProfilePicture() != null && !_u.getProfilePicture().isEmpty())
             ? _ctx + "/" + _u.getProfilePicture() : null;
 %>
@@ -26,9 +27,13 @@
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
             My Account & KYC
         </a>
-        <a href="<%= _ctx %>/user/transaction?action=history" class="<%= _uri.contains("transaction") ? "active" : "" %>">
+        <a href="<%= _ctx %>/user/transaction?action=history" class="<%= _uri.contains("transaction") && !"transfer".equals(_txAction) ? "active" : "" %>">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             Transactions
+        </a>
+        <a href="<%= _ctx %>/user/transaction?action=transfer" class="<%= _uri.contains("transaction") && "transfer".equals(_txAction) ? "active" : "" %>">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Transfer
         </a>
         <a href="<%= _ctx %>/user/creditCard" class="<%= _uri.contains("creditCard") ? "active" : "" %>">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>

@@ -78,6 +78,27 @@ public class AccountDAO {
         return null;
     }
 
+    public Account getAccountByUserId(int userId, Connection conn, boolean lockForUpdate) throws SQLException {
+        String sql = "SELECT * FROM accounts WHERE user_id = ?" + (lockForUpdate ? " FOR UPDATE" : "");
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToAccount(rs);
+            }
+            return null;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
+    }
+
     public Account getAccountById(int accountId) {
         String sql = "SELECT * FROM accounts WHERE account_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -91,6 +112,63 @@ public class AccountDAO {
             System.out.println("Error fetching account by ID: " + e.getMessage());
         }
         return null;
+    }
+
+    public Account getAccountById(int accountId, Connection conn, boolean lockForUpdate) throws SQLException {
+        String sql = "SELECT * FROM accounts WHERE account_id = ?" + (lockForUpdate ? " FOR UPDATE" : "");
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToAccount(rs);
+            }
+            return null;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public Account getAccountByAccountNumber(String accountNumber) {
+        String sql = "SELECT * FROM accounts WHERE account_number = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, accountNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToAccount(rs);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching account by account number: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Account getAccountByAccountNumber(String accountNumber, Connection conn, boolean lockForUpdate) throws SQLException {
+        String sql = "SELECT * FROM accounts WHERE account_number = ?" + (lockForUpdate ? " FOR UPDATE" : "");
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, accountNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToAccount(rs);
+            }
+            return null;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
     }
 
     private Account mapResultSetToAccount(ResultSet rs) throws SQLException {
