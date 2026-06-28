@@ -36,22 +36,37 @@ public class AccountService {
         if (existing != null && !"REJECTED".equals(existing.getStatus()) && !"CLOSED".equals(existing.getStatus())) {
             return "You already have an account application in progress or an active account.";
         }
+        boolean reapply = existing != null
+                && ("REJECTED".equals(existing.getStatus()) || "CLOSED".equals(existing.getStatus()));
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                int accountId = accountDAO.insertPendingAccount(accountShell, conn);
-                if (accountId < 0) {
-                    conn.rollback();
-                    return "Could not create account row.";
+                int accountId;
+                if (reapply) {
+                    accountShell.setAccountId(existing.getAccountId());
+                    if (!accountDAO.resetAccountForReapplication(accountShell, conn)) {
+                        conn.rollback();
+                        return "Could not reset account for re-application.";
+                    }
+                    accountId = existing.getAccountId();
+                } else {
+                    accountId = accountDAO.insertPendingAccount(accountShell, conn);
+                    if (accountId < 0) {
+                        conn.rollback();
+                        return "Could not create account row.";
+                    }
                 }
                 kyc.setUserId(accountShell.getUserId());
                 kyc.setPurpose(KycDetails.PURPOSE_ACCOUNT_OPENING);
                 kyc.setAccountId(accountId);
                 kyc.setCardId(null);
                 kyc.setStatus("PENDING");
-                if (!kycDetailsDAO.insert(kyc, conn)) {
+                boolean kycSaved = reapply
+                        ? kycDetailsDAO.updateAccountOpeningKyc(kyc, conn)
+                        : kycDetailsDAO.insert(kyc, conn);
+                if (!kycSaved) {
                     conn.rollback();
-                    return "Could not save KYC details.";
+                    return reapply ? "Could not update KYC details." : "Could not save KYC details.";
                 }
                 conn.commit();
                 return null;

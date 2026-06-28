@@ -9,8 +9,15 @@ public class PasswordEncryption {
         return hashPassword;
     }
 
-    public static boolean verifyPassword(String password, String hashedPassword){
-        return BCrypt.checkpw(password, hashedPassword);
+    public static boolean verifyPassword(String password, String hashedPassword) {
+        if (password == null || hashedPassword == null || !hashedPassword.startsWith("$2")) {
+            return false;
+        }
+        try {
+            return BCrypt.checkpw(password, hashedPassword);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
 }

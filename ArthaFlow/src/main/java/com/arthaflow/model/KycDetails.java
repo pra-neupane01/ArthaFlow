@@ -3,7 +3,7 @@ package com.arthaflow.model;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-/** One row per account opening or per credit card application (see {@code purpose}). */
+/** One row per account opening or per credit card application */
 public class KycDetails {
     public static final String PURPOSE_ACCOUNT_OPENING = "ACCOUNT_OPENING";
     public static final String PURPOSE_CREDIT_CARD = "CREDIT_CARD";

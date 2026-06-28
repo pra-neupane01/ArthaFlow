@@ -2,9 +2,7 @@ package com.arthaflow.model;
 
 import java.sql.Timestamp;
 
-/**
- * Bank account row (balances and lifecycle). KYC payload lives in {@code kyc_details}.
- */
+
 public class Account {
     private int accountId;
     private String account_number;
@@ -12,7 +10,6 @@ public class Account {
     private double balance;
     private String accountType;
     private String status;
-    /** Mirrored from {@code kyc_details} for the same account (not stored on {@code accounts}). */
     private String kycStatus;
     private Timestamp createdDate;
 

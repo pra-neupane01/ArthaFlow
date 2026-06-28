@@ -121,6 +121,40 @@ public class KycDetailsDAO {
         }
     }
 
+    public boolean updateAccountOpeningKyc(KycDetails k, Connection conn) throws SQLException {
+        String sql = "UPDATE kyc_details SET status = ?, citizenship_number = ?, date_of_birth = ?, occupation = ?, "
+                + "father_name = ?, mother_name = ?, family_details = ?, gender = ?, permanent_address = ?, "
+                + "mailing_address = ?, id_document_path = ?, address_proof_path = ?, rejection_remarks = NULL "
+                + "WHERE account_id = ? AND purpose = 'ACCOUNT_OPENING'";
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            int i = 1;
+            ps.setString(i++, k.getStatus() != null ? k.getStatus() : "PENDING");
+            ps.setString(i++, emptyToNull(k.getCitizenshipNumber()));
+            if (k.getDateOfBirth() != null) ps.setDate(i++, k.getDateOfBirth());
+            else ps.setNull(i++, Types.DATE);
+            ps.setString(i++, emptyToNull(k.getOccupation()));
+            ps.setString(i++, emptyToNull(k.getFatherName()));
+            ps.setString(i++, emptyToNull(k.getMotherName()));
+            ps.setString(i++, emptyToNull(k.getFamilyDetails()));
+            ps.setString(i++, emptyToNull(k.getGender()));
+            ps.setString(i++, emptyToNull(k.getPermanentAddress()));
+            ps.setString(i++, emptyToNull(k.getMailingAddress()));
+            ps.setString(i++, emptyToNull(k.getIdDocumentPath()));
+            ps.setString(i++, emptyToNull(k.getAddressProofPath()));
+            ps.setInt(i++, k.getAccountId());
+            return ps.executeUpdate() > 0;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
+    }
+
     public boolean updateStatusByAccountId(int accountId, String status) {
         String sql = "UPDATE kyc_details SET status = ? WHERE account_id = ? AND purpose = 'ACCOUNT_OPENING'";
         try (Connection conn = DatabaseConnection.getConnection();

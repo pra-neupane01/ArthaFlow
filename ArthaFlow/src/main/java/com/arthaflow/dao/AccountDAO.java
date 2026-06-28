@@ -41,8 +41,30 @@ public class AccountDAO {
         }
     }
 
+    /**
+     * Resets a rejected/closed account for re-application (same account_id, one row per user).
+     */
+    public boolean resetAccountForReapplication(Account account, Connection conn) throws SQLException {
+        String sql = "UPDATE accounts SET account_number = NULL, balance = ?, account_type = ?, status = 'PENDING' WHERE account_id = ?";
+        boolean closeConn = false;
+        if (conn == null) {
+            conn = DatabaseConnection.getConnection();
+            closeConn = true;
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, account.getBalance());
+            ps.setString(2, account.getAccountType());
+            ps.setInt(3, account.getAccountId());
+            return ps.executeUpdate() > 0;
+        } finally {
+            if (closeConn && conn != null) {
+                conn.close();
+            }
+        }
+    }
+
     public Account getAccountByUserId(int userId) {
-        String sql = "SELECT * FROM accounts WHERE user_id = ? ORDER BY created_date DESC, account_id DESC LIMIT 1";
+        String sql = "SELECT * FROM accounts WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
