@@ -47,6 +47,7 @@
                 <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:flex-end;">
                     <div style="display:flex;gap:0.75rem;">
                         <a href="<%= request.getContextPath() %>/user/transaction?action=deposit" class="btn btn-primary btn-sm">+ Deposit</a>
+                        <a href="<%= request.getContextPath() %>/user/transaction?action=transfer" class="btn btn-outline btn-sm">Transfer</a>
                         <a href="<%= request.getContextPath() %>/user/transaction?action=withdraw" class="btn btn-outline btn-sm">- Withdraw</a>
                     </div>
                     <div style="position:relative; width: 100%; max-width: 300px;">

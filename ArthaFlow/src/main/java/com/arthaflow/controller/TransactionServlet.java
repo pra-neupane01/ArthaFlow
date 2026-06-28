@@ -31,6 +31,11 @@ public class TransactionServlet extends HttpServlet {
             setKycWarningIfNeeded(req, user);
             req.getRequestDispatcher("/jsp/user/withdraw.jsp").forward(req, resp);
 
+        } else if ("transfer".equals(action)) {
+            setKycWarningIfNeeded(req, user);
+            req.setAttribute("account", accountService.getAccountDetails(user.getUserId()));
+            req.getRequestDispatcher("/jsp/user/transfer.jsp").forward(req, resp);
+
         } else {
             String range = req.getParameter("range");
             String from = req.getParameter("from");
@@ -58,10 +63,11 @@ public class TransactionServlet extends HttpServlet {
         String description = req.getParameter("description");
         if (description == null) description = "";
 
-        String jspPage = "deposit".equals(action) ? "/jsp/user/deposit.jsp" : "/jsp/user/withdraw.jsp";
+        String jspPage = getTransactionPage(action);
 
         // --- Pre-flight: check account & KYC ---
         Account account = accountService.getAccountDetails(user.getUserId());
+        req.setAttribute("account", account);
         if (account == null) {
             req.setAttribute("error", "You do not have a bank account yet. Please submit your KYC documents to open an account before making transactions.");
             req.getRequestDispatcher(jspPage).forward(req, resp);
@@ -113,6 +119,17 @@ public class TransactionServlet extends HttpServlet {
             }
             req.getRequestDispatcher("/jsp/user/withdraw.jsp").forward(req, resp);
 
+        } else if ("transfer".equals(action)) {
+            String receiverAccountNumber = req.getParameter("receiverAccountNumber");
+            String result = transactionService.transfer(user.getUserId(), receiverAccountNumber, amount, description);
+            if ("Transfer successful".equals(result)) {
+                req.setAttribute("success", String.format("Transfer of Rs. %,.2f was successful!", amount));
+            } else {
+                req.setAttribute("error", result);
+            }
+            req.setAttribute("account", accountService.getAccountDetails(user.getUserId()));
+            req.getRequestDispatcher("/jsp/user/transfer.jsp").forward(req, resp);
+
         } else {
             resp.sendRedirect(req.getContextPath() + "/user/dashboard");
         }
@@ -125,6 +142,18 @@ public class TransactionServlet extends HttpServlet {
             req.setAttribute("kycWarning", "You don't have a bank account yet. Please open an account and complete KYC verification before transacting.");
         } else if (!"ACTIVE".equals(account.getStatus())) {
             req.setAttribute("kycWarning", "Your account is pending KYC approval. You can only transact after our admin verifies your documents.");
+        } else if (!"APPROVED".equals(account.getKycStatus())) {
+            req.setAttribute("kycWarning", "KYC verification is still pending. You can only transact after admin approval.");
         }
+    }
+
+    private String getTransactionPage(String action) {
+        if ("deposit".equals(action)) {
+            return "/jsp/user/deposit.jsp";
+        }
+        if ("transfer".equals(action)) {
+            return "/jsp/user/transfer.jsp";
+        }
+        return "/jsp/user/withdraw.jsp";
     }
 }
