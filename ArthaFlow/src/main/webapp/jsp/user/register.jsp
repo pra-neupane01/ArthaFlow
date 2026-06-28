@@ -53,7 +53,7 @@
             </div>
         <% } else { %>
             <h2>Create Your Account</h2>
-            <p class="auth-sub">Fill in your details to get started. All amounts in NPR (Rs.).</p>
+            <p class="auth-sub">Fill in your details. We will email you a verification code before creating the account.</p>
 
             <% if (request.getAttribute("error") != null) { %>
                 <div class="alert alert-danger">Alert: <%= request.getAttribute("error") %></div>
@@ -91,7 +91,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full" style="margin-top: 0.5rem; padding: 0.85rem;">
-                    Register Now &rarr;
+                    Send Verification Code &rarr;
                 </button>
             </form>
 

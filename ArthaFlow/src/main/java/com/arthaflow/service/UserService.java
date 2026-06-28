@@ -1,6 +1,7 @@
 package com.arthaflow.service;
 
 import com.arthaflow.dao.UserDAO;
+import com.arthaflow.model.PendingRegistration;
 import com.arthaflow.model.User;
 import com.arthaflow.util.PasswordEncryption;
 import com.arthaflow.util.ValidationService;
@@ -27,6 +28,34 @@ public class UserService {
         user.setFullName(fullName);
         user.setPhoneNumber(phoneNumber);
         user.setAddress(address);
+        user.setRole("USER");
+
+        return userdao.registerUser(user);
+    }
+
+    public boolean registerVerifiedUser(PendingRegistration pendingRegistration) {
+        if (pendingRegistration == null || pendingRegistration.isExpired()) {
+            return false;
+        }
+
+        boolean emailValidation = pendingRegistration.getEmail() != null
+                && !ValidationService.isEmailExists(pendingRegistration.getEmail());
+        boolean phoneNumberValidation = ValidationService.isValidphoneNumber(pendingRegistration.getPhoneNumber());
+        boolean nameValidation = pendingRegistration.getFullName() != null
+                && !pendingRegistration.getFullName().trim().isEmpty();
+        boolean passwordValidation = pendingRegistration.getHashedPassword() != null
+                && pendingRegistration.getHashedPassword().startsWith("$2");
+
+        if (!emailValidation || !nameValidation || !phoneNumberValidation || !passwordValidation) {
+            return false;
+        }
+
+        User user = new User();
+        user.setEmail(pendingRegistration.getEmail());
+        user.setPassword(pendingRegistration.getHashedPassword());
+        user.setFullName(pendingRegistration.getFullName());
+        user.setPhoneNumber(pendingRegistration.getPhoneNumber());
+        user.setAddress(pendingRegistration.getAddress());
         user.setRole("USER");
 
         return userdao.registerUser(user);

@@ -1,20 +1,33 @@
 package com.arthaflow.controller;
 
-import com.arthaflow.service.UserService;
+import com.arthaflow.model.PendingRegistration;
+import com.arthaflow.service.EmailService;
+import com.arthaflow.util.PasswordEncryption;
 import com.arthaflow.util.ValidationService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 public class RegisterServlet extends HttpServlet {
-    UserService userService = new UserService();
+    private static final String PENDING_REGISTRATION = "pendingRegistration";
+    private static final SecureRandom OTP_RANDOM = new SecureRandom();
+
+    private final EmailService emailService = new EmailService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if ("1".equals(req.getParameter("restart"))) {
+            req.getSession().removeAttribute(PENDING_REGISTRATION);
+        }
+
         Object registrationSuccess = req.getSession().getAttribute("registrationSuccess");
         if (registrationSuccess != null) {
             req.getSession().removeAttribute("registrationSuccess");
@@ -48,12 +61,24 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (errorMsg == null) {
-            boolean success = userService.registerNewUser(email, password, fullName, phoneNumber, address);
-            if (success) {
-                req.getSession().setAttribute("registrationSuccess", true);
-                resp.sendRedirect(req.getContextPath() + "/register");
-            } else {
-                req.setAttribute("error", "Registration failed due to a system error. Please try again later.");
+            String otp = generateOtp();
+            PendingRegistration pendingRegistration = new PendingRegistration(
+                    email,
+                    PasswordEncryption.hashPassword(password),
+                    fullName,
+                    phoneNumber,
+                    address,
+                    PasswordEncryption.hashPassword(otp),
+                    Instant.now().plus(10, ChronoUnit.MINUTES)
+            );
+
+            try {
+                emailService.sendRegistrationOtp(email, fullName, otp);
+                req.getSession().setAttribute(PENDING_REGISTRATION, pendingRegistration);
+                resp.sendRedirect(req.getContextPath() + "/verify-email");
+            } catch (MessagingException e) {
+                System.out.println("Error sending registration OTP: " + e.getMessage());
+                req.setAttribute("error", "Could not send the verification email. Please check the address or try again later.");
                 req.getRequestDispatcher("/jsp/user/register.jsp").forward(req, resp);
             }
         } else {
@@ -68,5 +93,9 @@ public class RegisterServlet extends HttpServlet {
 
     private String normalizeEmail(String email) {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String generateOtp() {
+        return String.valueOf(100000 + OTP_RANDOM.nextInt(900000));
     }
 }

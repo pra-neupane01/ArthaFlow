@@ -25,6 +25,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>EmailVerificationServlet</servlet-name>
+        <servlet-class>com.arthaflow.controller.EmailVerificationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EmailVerificationServlet</servlet-name>
+        <url-pattern>/verify-email</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>com.arthaflow.controller.LogoutServlet</servlet-class>
     </servlet>
