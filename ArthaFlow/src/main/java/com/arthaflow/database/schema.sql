@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- One bank account per user (enforced at DB level and in application logic).
 CREATE TABLE IF NOT EXISTS accounts (
     account_id      INT PRIMARY KEY AUTO_INCREMENT,
     account_number  VARCHAR(20) UNIQUE,
@@ -22,7 +23,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     account_type    VARCHAR(50) NOT NULL,
     status          ENUM('PENDING', 'ACTIVE', 'CLOSED', 'FROZEN', 'REJECTED') DEFAULT 'PENDING',
     created_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY uk_accounts_one_per_user (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS transactions (

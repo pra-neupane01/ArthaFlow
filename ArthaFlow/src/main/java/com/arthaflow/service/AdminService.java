@@ -34,10 +34,6 @@ public class AdminService {
     }
 
     public boolean deleteUser(int userId) {
-        Account account = accountDAO.getAccountByUserId(userId);
-        if (account != null) {
-            accountDAO.deleteAccount(account.getAccountId());
-        }
         return userDAO.deleteUser(userId);
     }
 
